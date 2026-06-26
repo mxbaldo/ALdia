@@ -3,912 +3,829 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<title>AlDía</title>
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<title>AlDia</title>
 <style>
-/* ── RESET ── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;background:#111;color:#fff;
-  font-family:-apple-system,'Segoe UI',Roboto,sans-serif;
-  -webkit-tap-highlight-color:transparent;user-select:none}
-:root{
-  --bg:#111111;--surface:#1c1e24;--surface2:#252830;--card:#fff;
-  --accent:#e8342a;--accent2:#1a73e8;--text:#fff;--muted:#9aa0b0;
-  --nav:#16181f;--nav-h:62px;--top-h:54px;--banner-h:64px;
-  --radius:12px;--radius-sm:8px;
-}
-/* scrollbars hidden */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#111;color:#fff;
+  font-family:Arial,sans-serif;overflow:hidden;user-select:none}
 ::-webkit-scrollbar{display:none}
-*{scrollbar-width:none}
 
-/* ══════════════ AUTH LOADING ══════════════ */
-#auth-loading{
-  position:fixed;inset:0;z-index:9999;background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
-.spinner{width:34px;height:34px;border:3px solid #333;
-  border-top-color:var(--accent);border-radius:50%;
-  animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#auth-loading p{color:var(--muted);font-size:13px}
+/* VARIABLES */
+:root{
+  --bg:#111;--s1:#1c1e24;--s2:#252830;
+  --acc:#e8342a;--blue:#1a73e8;--muted:#9aa0b0;
+  --nav:62px;--top:52px;--ban:60px;
+}
 
-/* ══════════════ LOGIN SCREEN ══════════════ */
-#login-screen{
-  position:fixed;inset:0;z-index:9998;background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:32px 20px;
-  transition:opacity .35s ease,transform .35s ease}
-#login-screen.hidden{opacity:0;transform:translateY(-16px);pointer-events:none}
+/* ══ TOP BAR ══ */
+#top{
+  position:fixed;top:0;left:0;right:0;height:var(--top);
+  background:#1c1e24;border-bottom:1px solid #222;
+  display:flex;align-items:center;padding:0 14px;gap:10px;z-index:50}
+#btn-menu{font-size:24px;cursor:pointer;line-height:1}
+#top-title{flex:1;font-size:19px;font-weight:900;letter-spacing:-.5px}
+#top-title b{color:var(--acc)}
+.ticon{font-size:18px;color:var(--muted);cursor:pointer}
 
-.login-brand{font-size:36px;font-weight:900;letter-spacing:-1px;margin-bottom:6px}
-.login-brand span{color:var(--accent)}
-.login-sub{color:var(--muted);font-size:13px;margin-bottom:32px;text-align:center}
-
-.login-box{width:100%;max-width:360px;background:var(--surface);
-  border-radius:16px;padding:26px 22px;border:1px solid #2a2c34}
-.login-box h2{font-size:18px;font-weight:700;margin-bottom:20px}
-
-.fld{margin-bottom:14px}
-.fld label{display:block;font-size:11px;font-weight:600;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.fld input{width:100%;background:#0d0f14;border:1.5px solid #2e3040;
-  border-radius:10px;padding:13px 14px;font-size:15px;color:#fff;
-  outline:none;transition:border-color .2s;-webkit-appearance:none}
-.fld input:focus{border-color:var(--accent2)}
-.fld input::placeholder{color:#444}
-
-.btn-login{width:100%;padding:14px;background:var(--accent);
-  color:#fff;border:none;border-radius:10px;font-size:15px;
-  font-weight:700;cursor:pointer;transition:opacity .2s,transform .1s;margin-top:4px}
-.btn-login:active{transform:scale(.97);opacity:.85}
-
-.login-register{text-align:center;margin-top:14px;font-size:13px;color:var(--muted)}
-.login-register a{color:var(--accent2);text-decoration:none;font-weight:600}
-
-.register-panel{display:none}
-.register-panel.show{display:block}
-
-#login-err{color:#ff6b6b;font-size:12px;text-align:center;min-height:18px;margin-top:10px}
-
-/* ══════════════ APP SHELL ══════════════ */
-#app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
-
-/* ── TOP BAR ── */
-#top-bar{
-  flex-shrink:0;height:var(--top-h);background:var(--surface);
-  border-bottom:1px solid #22252f;
-  display:flex;align-items:center;padding:0 14px;gap:12px;z-index:100}
-.top-menu{font-size:22px;cursor:pointer;line-height:1;color:var(--text)}
-.top-title{flex:1;font-size:20px;font-weight:900;letter-spacing:-.5px}
-.top-title span{color:var(--accent)}
-.top-icons{display:flex;gap:12px}
-.top-icon{font-size:18px;cursor:pointer;color:var(--muted)}
-
-/* ── DRAWER MENU ── */
-#drawer-overlay{
-  position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);
-  opacity:0;pointer-events:none;transition:opacity .25s}
-#drawer-overlay.open{opacity:1;pointer-events:all}
-#drawer{
-  position:fixed;top:0;left:0;bottom:0;width:72%;max-width:280px;
-  background:var(--surface);z-index:301;
-  transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
-  display:flex;flex-direction:column;padding:0}
-#drawer.open{transform:translateX(0)}
-.drawer-header{background:var(--accent);padding:28px 20px 20px;
-  display:flex;align-items:flex-end;gap:10px}
-.drawer-logo{font-size:26px;font-weight:900;color:#fff;letter-spacing:-.5px}
-.drawer-logo span{opacity:.8}
-.drawer-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
-.drawer-nav{flex:1;overflow-y:auto;padding:10px 0}
-.drawer-item{display:flex;align-items:center;gap:14px;
-  padding:15px 20px;font-size:15px;font-weight:500;cursor:pointer;
-  border-left:3px solid transparent;transition:background .15s,border-color .15s}
-.drawer-item:active{background:#252830}
-.drawer-item.active-nav{border-left-color:var(--accent);color:var(--accent);background:#1f2028}
-.drawer-item .di{font-size:20px;width:24px;text-align:center}
-.drawer-divider{height:1px;background:#2a2c34;margin:8px 20px}
-.drawer-footer{padding:20px;border-top:1px solid #2a2c34}
-#btn-logout{width:100%;padding:12px;background:transparent;border:1.5px solid #444;
-  color:var(--muted);border-radius:10px;font-size:14px;font-weight:600;cursor:pointer}
-#btn-logout:active{border-color:#e53935;color:#e53935}
-.drawer-user{font-size:12px;color:var(--muted);margin-bottom:10px;
-  display:flex;align-items:center;gap:6px}
-
-/* ── INFO BANNER (weather / dollar rotator) ── */
-#info-banner{
-  flex-shrink:0;height:var(--banner-h);background:var(--surface2);
-  border-bottom:1px solid #22252f;
-  display:flex;align-items:center;padding:0 14px;gap:14px;overflow:hidden;
-  position:relative}
-.banner-slide{display:flex;align-items:center;gap:14px;width:100%;
-  position:absolute;left:0;top:0;height:100%;padding:0 14px;
-  transition:opacity .5s,transform .5s}
-.banner-slide.hidden-slide{opacity:0;transform:translateX(40px);pointer-events:none}
-.banner-icon{width:42px;height:42px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.bi-weather{background:#1a73e8}
-.bi-dollar{background:#1a7a3a}
-.bi-euro{background:#7b3fa0}
-.bi-btc{background:#f7931a}
-.banner-info{flex:1;min-width:0}
-.banner-label{font-size:10px;font-weight:700;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.6px}
-.banner-value{font-size:15px;font-weight:800;white-space:nowrap;
-  overflow:hidden;text-overflow:ellipsis}
-.banner-dots{display:flex;gap:5px;flex-shrink:0}
-.bdot{width:7px;height:7px;border-radius:50%;background:#444;cursor:pointer;
-  transition:background .2s}
-.bdot.active{background:var(--accent)}
-
-/* ── CONTENT ── */
-#content-area{flex:1;overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;padding:12px 12px 10px}
-
-/* ── SEARCH BAR (inside content for radios tab) ── */
-.tab-search{
-  display:flex;align-items:center;gap:10px;
-  background:var(--surface2);border:1.5px solid #2a2c34;
-  border-radius:24px;padding:10px 16px;margin-bottom:16px}
-.tab-search input{flex:1;background:transparent;border:none;outline:none;
-  font-size:14px;color:#fff}
-.tab-search input::placeholder{color:#555}
-.tab-search .si{font-size:16px;color:var(--muted)}
-
-/* ── SECTION LABEL ── */
-.sec-label{font-size:13px;font-weight:800;color:var(--text);
-  text-transform:uppercase;letter-spacing:.5px;
-  display:flex;align-items:baseline;gap:6px;margin:0 0 10px}
-.sec-label .sc{color:var(--muted);font-size:12px;font-weight:600}
-.sec-row{margin-bottom:20px}
-
-/* ── NEWSPAPER LOGO CARDS (horizontal scroll) ── */
-.logos-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
-.logo-card{flex-shrink:0;width:90px;
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  cursor:pointer;text-decoration:none;color:var(--text)}
-.logo-card-img{
-  width:90px;height:70px;border-radius:10px;
-  background:#fff;border:1.5px solid #2a2c34;
+/* ══ BANNER ══ */
+#banner{
+  position:fixed;top:var(--top);left:0;right:0;height:var(--ban);
+  background:#1c1e24;border-bottom:1px solid #222;
+  display:flex;align-items:center;padding:0 12px;gap:10px;z-index:49;overflow:hidden}
+.b-icon{width:38px;height:38px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  overflow:hidden;font-size:11px;font-weight:800;
-  position:relative;transition:transform .12s,border-color .15s}
-.logo-card-img:active{transform:scale(.93)}
-.logo-card-img.playing-card{border-color:var(--accent)}
-/* page-curl effect */
-.logo-card-img::after{
-  content:'';position:absolute;bottom:0;right:0;
-  width:14px;height:14px;
-  background:linear-gradient(135deg,#ccc 40%,#fff 40%);
-  border-radius:4px 0 0 0}
-.logo-card-name{font-size:10px;color:var(--muted);text-align:center;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:90px}
+  font-size:18px;flex-shrink:0}
+.bw{background:#1a73e8}.bd{background:#1a7a3a}
+.be{background:#7b3fa0}.bb{background:#f7931a}.bbl{background:#555}
+.b-info{flex:1;min-width:0}
+.b-lbl{font-size:10px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.5px}
+.b-val{font-size:14px;font-weight:800;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.b-dots{display:flex;gap:5px;flex-shrink:0}
+.dot{width:7px;height:7px;border-radius:50%;background:#444;cursor:pointer}
+.dot.on{background:var(--acc)}
 
-/* ── RADIO GRID CARDS ── */
-.radio-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.radio-card{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
-.radio-card-img{
-  width:100%;aspect-ratio:1;border-radius:10px;background:#fff;
+/* ══ CONTENT ══ */
+#content{
+  position:fixed;
+  top:calc(var(--top) + var(--ban));
+  left:0;right:0;
+  bottom:var(--nav);
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:12px 12px 8px}
+
+/* ══ TAB PANELS ══ */
+.tab{display:none}
+.tab.on{display:block}
+
+/* ══ SECTION ══ */
+.sec{margin-bottom:18px}
+.sec-h{font-size:12px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.5px;color:#fff;margin-bottom:10px;
+  display:flex;align-items:baseline;gap:6px}
+.sec-h span{color:var(--muted);font-size:11px;font-weight:600}
+
+/* ══ NEWSPAPER LOGO CARDS ══ */
+.hscroll{display:flex;gap:9px;overflow-x:auto;padding-bottom:4px;
+  -webkit-overflow-scrolling:touch}
+.nc{flex-shrink:0;width:88px;display:flex;flex-direction:column;
+  align-items:center;gap:5px;text-decoration:none;color:#fff;cursor:pointer}
+.nc-img{
+  width:88px;height:66px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;text-align:center;line-height:1.2;padding:4px;
+  border:1.5px solid #2a2c34;position:relative;overflow:hidden}
+.nc-img::after{content:'';position:absolute;bottom:0;right:0;
+  width:13px;height:13px;
+  background:linear-gradient(135deg,#bbb 40%,rgba(255,255,255,.1) 40%)}
+.nc-name{font-size:10px;color:var(--muted);text-align:center;
+  max-width:88px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ══ RADIO GRID ══ */
+.rgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.rc{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.rc-img{
+  width:100%;aspect-ratio:1/1;border-radius:9px;
   border:2px solid transparent;
   display:flex;align-items:center;justify-content:center;
-  overflow:hidden;font-size:10px;font-weight:800;color:#333;
-  transition:border-color .15s,transform .12s;position:relative}
-.radio-card-img:active{transform:scale(.93)}
-.radio-card-img.playing-card{border-color:var(--accent2)!important}
-.radio-card-name{font-size:10px;color:var(--muted);text-align:center;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
-.hidden-card{display:none!important}
+  font-weight:900;text-align:center;padding:3px;line-height:1.2;
+  transition:border-color .15s}
+.rc-img.playing{border-color:var(--blue)!important}
+.rc-name{font-size:10px;color:var(--muted);text-align:center;
+  width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hid{display:none!important}
 
-/* ── NOTICIAS TAB ── */
-.news-card{
-  background:var(--surface);border-radius:var(--radius);
-  border:1px solid #252830;padding:14px;margin-bottom:10px;
-  cursor:pointer;text-decoration:none;color:var(--text);
-  display:flex;flex-direction:column;gap:6px;
-  transition:background .15s}
-.news-card:active{background:#252830}
-.news-cat{font-size:10px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.5px;color:var(--accent)}
-.news-title{font-size:14px;font-weight:700;line-height:1.35}
-.news-src{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
-.news-dot{width:4px;height:4px;border-radius:50%;background:var(--muted)}
-.news-loading{text-align:center;color:var(--muted);font-size:13px;padding:24px 0}
-.live-dot{display:inline-block;width:7px;height:7px;
-  border-radius:50%;background:#e53935;margin-right:5px;
-  animation:blink 1.1s ease infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+/* ══ SEARCH ══ */
+.srch{
+  display:flex;align-items:center;gap:8px;
+  background:#252830;border:1.5px solid #2a2c34;
+  border-radius:22px;padding:9px 14px;margin-bottom:14px}
+.srch input{flex:1;background:transparent;border:none;outline:none;
+  font-size:14px;color:#fff}
+.srch input::placeholder{color:#555}
 
-/* ── BOTTOM NAV ── */
-#bottom-nav{
-  flex-shrink:0;height:var(--nav-h);background:var(--nav);
-  border-top:1px solid #22252f;
-  display:flex;position:relative;z-index:100}
-.nav-btn{
+/* ══ NEWS CARDS ══ */
+.ncard{
+  background:#1c1e24;border-radius:11px;border:1px solid #252830;
+  padding:13px;margin-bottom:9px;cursor:pointer}
+.n-cat{font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.5px;color:var(--acc);margin-bottom:4px}
+.n-title{font-size:13px;font-weight:700;line-height:1.35;margin-bottom:5px}
+.n-src{font-size:11px;color:var(--muted)}
+.n-empty{text-align:center;color:var(--muted);font-size:13px;padding:30px 0}
+
+/* ══ BOTTOM NAV ══ */
+#nav{
+  position:fixed;bottom:0;left:0;right:0;height:var(--nav);
+  background:#16181f;border-top:1px solid #222;
+  display:flex;z-index:50}
+.nb{
   flex:1;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:3px;
   border:none;background:transparent;cursor:pointer;
-  color:var(--muted);font-size:10px;font-weight:600;
-  transition:color .18s;-webkit-tap-highlight-color:transparent}
-.nav-btn .nicon{font-size:22px;line-height:1;transition:transform .2s}
-.nav-btn.active{color:var(--accent)}
-.nav-btn.active .nicon{transform:scale(1.15)}
-.nav-active-bg{
-  position:absolute;top:0;transition:left .25s cubic-bezier(.4,0,.2,1);
-  width:25%;height:2px;background:var(--accent);border-radius:0 0 3px 3px}
+  color:var(--muted);font-size:10px;font-weight:600}
+.nb .ni{font-size:20px;line-height:1}
+.nb.on{color:var(--acc)}
+#nav-bar{position:absolute;top:0;height:2px;background:var(--acc);
+  width:25%;border-radius:0 0 3px 3px;transition:left .22s}
 
-/* ── FLOATING RADIO PLAYER ── */
-#float-player{
-  position:fixed;bottom:calc(var(--nav-h) + 8px);left:10px;right:10px;
-  background:#1565c0;border-radius:14px;
-  display:flex;align-items:center;gap:12px;padding:10px 14px;
-  z-index:200;box-shadow:0 6px 28px rgba(21,101,192,.5);
-  transform:translateY(130%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
-#float-player.visible{transform:translateY(0)}
-#fp-logo{width:48px;height:48px;border-radius:8px;
-  background:#fff;display:flex;align-items:center;
-  justify-content:center;font-size:10px;font-weight:800;
-  color:#333;flex-shrink:0;overflow:hidden}
+/* ══ DRAWER ══ */
+#ov{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.6);
+  opacity:0;pointer-events:none;transition:opacity .22s}
+#ov.on{opacity:1;pointer-events:all}
+#drw{
+  position:fixed;top:0;left:0;bottom:0;width:70%;max-width:270px;
+  background:#1c1e24;z-index:81;
+  transform:translateX(-100%);transition:transform .25s;
+  display:flex;flex-direction:column}
+#drw.on{transform:translateX(0)}
+.dh{background:var(--acc);padding:30px 18px 18px;
+  font-size:24px;font-weight:900}
+.dh small{display:block;font-size:11px;opacity:.7;font-weight:400;margin-top:2px}
+.di{display:flex;align-items:center;gap:12px;padding:14px 18px;
+  font-size:14px;font-weight:500;cursor:pointer;
+  border-left:3px solid transparent}
+.di:active{background:#252830}
+.di.on{border-left-color:var(--acc);color:var(--acc);background:#1f2028}
+.dico{font-size:18px;width:22px;text-align:center}
+.ddiv{height:1px;background:#2a2c34;margin:6px 18px}
+.dfoot{padding:16px 18px;border-top:1px solid #2a2c34;margin-top:auto}
+.duser{font-size:11px;color:var(--muted);margin-bottom:10px}
+#btn-out{width:100%;padding:11px;background:transparent;
+  border:1.5px solid #444;color:var(--muted);border-radius:9px;
+  font-size:13px;font-weight:600;cursor:pointer}
+
+/* ══ FLOATING PLAYER ══ */
+#fplayer{
+  position:fixed;left:10px;right:10px;
+  bottom:calc(var(--nav) + 8px);
+  background:#1565c0;border-radius:13px;
+  display:flex;align-items:center;gap:11px;padding:10px 12px;
+  z-index:60;box-shadow:0 6px 24px rgba(21,101,192,.5);
+  transform:translateY(130%);transition:transform .28s}
+#fplayer.on{transform:translateY(0)}
+#fp-logo{width:44px;height:44px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:900;text-align:center;
+  flex-shrink:0;overflow:hidden}
 #fp-info{flex:1;min-width:0}
-.fp-bars{display:flex;gap:2px;align-items:flex-end;height:14px;margin-bottom:4px}
-.fp-bar{width:3px;background:#76c7f0;border-radius:2px;
-  animation:bar-anim .8s ease infinite}
-.fp-bar:nth-child(1){height:6px;animation-delay:0s}
-.fp-bar:nth-child(2){height:12px;animation-delay:.15s}
-.fp-bar:nth-child(3){height:8px;animation-delay:.3s}
-.fp-bar:nth-child(4){height:14px;animation-delay:.1s}
-.fp-bar:nth-child(5){height:5px;animation-delay:.25s}
-@keyframes bar-anim{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.4)}}
-.fp-bars.paused .fp-bar{animation:none;transform:scaleY(.4)}
-#fp-name{font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#fp-sub{font-size:11px;color:rgba(255,255,255,.65)}
-#fp-pause{width:46px;height:46px;border-radius:50%;background:#43a047;
-  border:none;color:#fff;font-size:22px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  transition:background .2s}
-#fp-pause:active{background:#388e3c}
+.fp-bars{display:flex;gap:2px;align-items:flex-end;height:13px;margin-bottom:3px}
+.fp-b{width:3px;background:#76c7f0;border-radius:2px;
+  animation:ba .8s ease infinite}
+.fp-b:nth-child(1){height:5px;animation-delay:0s}
+.fp-b:nth-child(2){height:11px;animation-delay:.15s}
+.fp-b:nth-child(3){height:7px;animation-delay:.3s}
+.fp-b:nth-child(4){height:13px;animation-delay:.1s}
+.fp-b:nth-child(5){height:4px;animation-delay:.25s}
+@keyframes ba{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.35)}}
+.fp-bars.psd .fp-b{animation:none;transform:scaleY(.3)}
+#fp-name{font-size:14px;font-weight:800;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#fp-sub{font-size:10px;color:rgba(255,255,255,.65)}
+#fp-btn{width:44px;height:44px;border-radius:50%;background:#43a047;
+  border:none;color:#fff;font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ══ LOGIN ══ */
+#login{
+  position:fixed;inset:0;z-index:200;background:#111;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:28px 20px;
+  transition:opacity .3s,transform .3s}
+#login.hide{opacity:0;transform:translateY(-14px);pointer-events:none}
+.l-brand{font-size:34px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px}
+.l-brand b{color:var(--acc)}
+.l-sub{color:var(--muted);font-size:12px;margin-bottom:28px}
+.l-box{width:100%;max-width:340px;background:#1c1e24;
+  border-radius:14px;padding:22px 18px;border:1px solid #252830}
+.l-box h2{font-size:17px;font-weight:700;margin-bottom:18px}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:10px;font-weight:700;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.fld input{width:100%;background:#0d0f14;border:1.5px solid #2e3040;
+  border-radius:9px;padding:12px 13px;font-size:15px;color:#fff;
+  outline:none;-webkit-appearance:none}
+.fld input:focus{border-color:var(--blue)}
+.fld input::placeholder{color:#444}
+.l-btn{width:100%;padding:13px;background:var(--acc);
+  color:#fff;border:none;border-radius:9px;
+  font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
+.l-link{text-align:center;margin-top:12px;font-size:12px;color:var(--muted)}
+.l-link a{color:var(--blue);text-decoration:none;font-weight:600}
+#l-err{color:#ff6b6b;font-size:11px;text-align:center;min-height:16px;margin-top:8px}
+
+/* ══ BLINK DOT ══ */
+.live{display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:#e53935;margin-right:4px;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 </style>
 </head>
 <body>
 
-<!-- AUTH LOADING -->
-<div id="auth-loading">
-  <div class="spinner"></div>
-  <p>Cargando AlDía…</p>
-</div>
-
-<!-- LOGIN SCREEN -->
-<div id="login-screen" class="hidden">
-  <div class="login-brand">Al<span>Día</span></div>
-  <div class="login-sub">Medios &amp; información argentina</div>
-
-  <div class="login-box">
-    <!-- LOGIN PANEL -->
-    <div id="panel-login">
-      <h2>Iniciar Sesión</h2>
-      <div class="fld">
-        <label>Correo electrónico</label>
-        <input type="email" id="li-email" placeholder="usuario@mail.com" autocomplete="email"/>
-      </div>
-      <div class="fld">
-        <label>Contraseña</label>
-        <input type="password" id="li-pass" placeholder="••••••••" autocomplete="current-password"/>
-      </div>
-      <button class="btn-login" id="btn-li">Entrar</button>
-      <div id="login-err"></div>
-      <div class="login-register">
-        ¿No tenés cuenta? <a href="#" id="lnk-register">Registrarse</a>
-      </div>
+<!-- LOGIN -->
+<div id="login">
+  <div class="l-brand">Al<b>Día</b></div>
+  <div class="l-sub">Medios &amp; información argentina</div>
+  <div class="l-box">
+    <div id="lp-login">
+      <h2>Iniciar sesión</h2>
+      <div class="fld"><label>Correo</label>
+        <input type="email" id="li-em" placeholder="usuario@mail.com"/></div>
+      <div class="fld"><label>Contraseña</label>
+        <input type="password" id="li-pw" placeholder="••••••••"/></div>
+      <button class="l-btn" onclick="doLogin()">Entrar</button>
+      <div id="l-err"></div>
+      <div class="l-link">¿No tenés cuenta? <a onclick="showReg()">Registrarse</a></div>
     </div>
-
-    <!-- REGISTER PANEL -->
-    <div id="panel-register" class="register-panel">
+    <div id="lp-reg" style="display:none">
       <h2>Crear cuenta</h2>
-      <div class="fld">
-        <label>Correo electrónico</label>
-        <input type="email" id="reg-email" placeholder="usuario@mail.com" autocomplete="email"/>
-      </div>
-      <div class="fld">
-        <label>Contraseña</label>
-        <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password"/>
-      </div>
-      <button class="btn-login" id="btn-reg">Crear cuenta</button>
-      <div id="login-err"></div>
-      <div class="login-register">
-        ¿Ya tenés cuenta? <a href="#" id="lnk-login">Iniciar sesión</a>
-      </div>
+      <div class="fld"><label>Correo</label>
+        <input type="email" id="reg-em" placeholder="usuario@mail.com"/></div>
+      <div class="fld"><label>Contraseña (mín. 6 caracteres)</label>
+        <input type="password" id="reg-pw" placeholder="••••••••"/></div>
+      <button class="l-btn" onclick="doReg()">Crear cuenta</button>
+      <div id="l-err"></div>
+      <div class="l-link">¿Ya tenés cuenta? <a onclick="showLogin()">Iniciar sesión</a></div>
     </div>
   </div>
 </div>
 
-<!-- APP -->
-<div id="app">
+<!-- TOP BAR -->
+<div id="top">
+  <div id="btn-menu" onclick="openDrw()">☰</div>
+  <div id="top-title">Al<b>Día</b></div>
+  <span class="ticon">🔖</span>
+  <span class="ticon">⚙️</span>
+</div>
 
-  <!-- TOP BAR -->
-  <div id="top-bar">
-    <div class="top-menu" id="btn-menu">☰</div>
-    <div class="top-title" id="top-title">Al<span>Día</span></div>
-    <div class="top-icons">
-      <span class="top-icon" id="btn-bookmark">🔖</span>
-      <span class="top-icon" id="btn-settings">⚙️</span>
+<!-- BANNER -->
+<div id="banner">
+  <div class="b-dots" id="bdots"></div>
+</div>
+
+<!-- CONTENT -->
+<div id="content">
+
+  <!-- DIARIOS -->
+  <div id="tab-diarios" class="tab on">
+    <div class="sec">
+      <div class="sec-h">Recientes <span>(5)</span></div>
+      <div class="hscroll" id="row-rec"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-h">General <span>(8)</span></div>
+      <div class="hscroll" id="row-gen"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-h">Economía y Política <span>(5)</span></div>
+      <div class="hscroll" id="row-eco"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-h">Deportes</div>
+      <div class="hscroll" id="row-dep"></div>
+    </div>
+    <div class="sec">
+      <div class="sec-h">Internacional</div>
+      <div class="hscroll" id="row-int"></div>
     </div>
   </div>
 
-  <!-- INFO BANNER -->
-  <div id="info-banner">
-    <!-- slides injected by JS -->
-    <div class="banner-dots" id="banner-dots"></div>
+  <!-- NOTICIAS -->
+  <div id="tab-noticias" class="tab">
+    <div class="n-empty" id="news-msg">Tocá 🔥 para cargar noticias del día</div>
+    <div id="news-list"></div>
   </div>
 
-  <!-- CONTENT -->
-  <div id="content-area">
-
-    <!-- TAB: DIARIOS -->
-    <div id="tab-diarios" class="tab-panel">
-      <div class="sec-row">
-        <div class="sec-label">Recientes <span class="sc">(5)</span></div>
-        <div class="logos-scroll" id="recent-row"></div>
-      </div>
-      <div class="sec-row">
-        <div class="sec-label">General <span class="sc">(8)</span></div>
-        <div class="logos-scroll" id="general-row"></div>
-      </div>
-      <div class="sec-row">
-        <div class="sec-label">Economía y Política <span class="sc">(5)</span></div>
-        <div class="logos-scroll" id="econ-row"></div>
-      </div>
-      <div class="sec-row">
-        <div class="sec-label">Deportes</div>
-        <div class="logos-scroll" id="dep-row"></div>
-      </div>
-      <div class="sec-row">
-        <div class="sec-label">Internacional</div>
-        <div class="logos-scroll" id="intl-row"></div>
-      </div>
+  <!-- RADIOS -->
+  <div id="tab-radios" class="tab">
+    <div class="srch">
+      <span>🔍</span>
+      <input type="search" id="rsrch" placeholder="Buscar emisora…" oninput="filterRadios(this.value)"/>
     </div>
-
-    <!-- TAB: NOTICIAS -->
-    <div id="tab-noticias" class="tab-panel" style="display:none">
-      <div class="news-loading" id="news-loading">⏳ Cargando noticias…</div>
-      <div id="news-list"></div>
+    <div class="sec">
+      <div class="sec-h">Recientes</div>
+      <div class="rgrid" id="row-rrec"></div>
     </div>
-
-    <!-- TAB: RADIOS -->
-    <div id="tab-radios" class="tab-panel" style="display:none">
-      <div class="tab-search">
-        <span class="si">🔍</span>
-        <input type="search" id="radio-search" placeholder="Buscar emisora…"/>
-      </div>
-      <div class="sec-row">
-        <div class="sec-label">Recientes</div>
-        <div class="radio-grid" id="recent-radios"></div>
-      </div>
-      <div class="sec-row">
-        <div class="sec-label">Nacionales</div>
-        <div class="radio-grid" id="all-radios"></div>
-      </div>
+    <div class="sec">
+      <div class="sec-h">Nacionales</div>
+      <div class="rgrid" id="row-rall"></div>
     </div>
+  </div>
 
-    <!-- TAB: BUSCAR -->
-    <div id="tab-buscar" class="tab-panel" style="display:none">
-      <div class="tab-search">
-        <span class="si">🔍</span>
-        <input type="search" id="global-search" placeholder="Buscar diarios, radios…"/>
-      </div>
-      <div id="search-results"></div>
+  <!-- BUSCAR -->
+  <div id="tab-buscar" class="tab">
+    <div class="srch">
+      <span>🔍</span>
+      <input type="search" id="gsrch" placeholder="Buscar diarios, radios…" oninput="globalSearch(this.value)"/>
     </div>
+    <div id="gres"></div>
+  </div>
 
-  </div><!-- /content-area -->
+</div>
 
-  <!-- BOTTOM NAV -->
-  <nav id="bottom-nav">
-    <div class="nav-active-bg" id="nav-bar"></div>
-    <button class="nav-btn active" data-tab="diarios" data-idx="0">
-      <span class="nicon">🗞️</span>Diarios
-    </button>
-    <button class="nav-btn" data-tab="noticias" data-idx="1">
-      <span class="nicon">🔥</span>Noticias
-    </button>
-    <button class="nav-btn" data-tab="radios" data-idx="2">
-      <span class="nicon">📻</span>Radios
-    </button>
-    <button class="nav-btn" data-tab="buscar" data-idx="3">
-      <span class="nicon">🔍</span>Buscar
-    </button>
-  </nav>
-</div><!-- /app -->
+<!-- BOTTOM NAV -->
+<div id="nav">
+  <div id="nav-bar" style="left:0"></div>
+  <button class="nb on" onclick="goTab('diarios',0)"><span class="ni">🗞️</span>Diarios</button>
+  <button class="nb"    onclick="goTab('noticias',1)"><span class="ni">🔥</span>Noticias</button>
+  <button class="nb"    onclick="goTab('radios',2)"><span class="ni">📻</span>Radios</button>
+  <button class="nb"    onclick="goTab('buscar',3)"><span class="ni">🔍</span>Buscar</button>
+</div>
 
 <!-- DRAWER -->
-<div id="drawer-overlay"></div>
-<div id="drawer">
-  <div class="drawer-header">
-    <div>
-      <div class="drawer-logo">Al<span>Día</span></div>
-      <div class="drawer-sub">Medios argentinos</div>
-    </div>
-  </div>
-  <div class="drawer-nav">
-    <div class="drawer-item active-nav" data-tab="diarios"><span class="di">🗞️</span> Diarios</div>
-    <div class="drawer-item" data-tab="noticias"><span class="di">🔥</span> Noticias del día</div>
-    <div class="drawer-item" data-tab="radios"><span class="di">📻</span> Radios en vivo</div>
-    <div class="drawer-divider"></div>
-    <div class="drawer-item" id="drawer-config"><span class="di">⚙️</span> Configuración</div>
-  </div>
-  <div class="drawer-footer">
-    <div class="drawer-user" id="drawer-user">👤 No iniciaste sesión</div>
-    <button id="btn-logout">Cerrar sesión</button>
+<div id="ov" onclick="closeDrw()"></div>
+<div id="drw">
+  <div class="dh">Al<span style="opacity:.7">Día</span><small>Medios argentinos</small></div>
+  <div class="di on" onclick="goTab('diarios',0);closeDrw()"><span class="dico">🗞️</span>Diarios</div>
+  <div class="di" onclick="goTab('noticias',1);closeDrw()"><span class="dico">🔥</span>Noticias del día</div>
+  <div class="di" onclick="goTab('radios',2);closeDrw()"><span class="dico">📻</span>Radios en vivo</div>
+  <div class="di" onclick="goTab('buscar',3);closeDrw()"><span class="dico">🔍</span>Buscar</div>
+  <div class="ddiv"></div>
+  <div class="di" onclick="closeDrw();alert('Próximamente')"><span class="dico">⚙️</span>Configuración</div>
+  <div class="dfoot">
+    <div class="duser" id="duser">👤 Sin sesión iniciada</div>
+    <button id="btn-out" onclick="doLogout()">Cerrar sesión</button>
   </div>
 </div>
 
 <!-- FLOATING PLAYER -->
-<div id="float-player">
+<div id="fplayer">
   <div id="fp-logo">📻</div>
   <div id="fp-info">
     <div class="fp-bars" id="fp-bars">
-      <div class="fp-bar"></div>
-      <div class="fp-bar"></div>
-      <div class="fp-bar"></div>
-      <div class="fp-bar"></div>
-      <div class="fp-bar"></div>
+      <div class="fp-b"></div><div class="fp-b"></div>
+      <div class="fp-b"></div><div class="fp-b"></div><div class="fp-b"></div>
     </div>
     <div id="fp-name">Radio</div>
     <div id="fp-sub">En vivo</div>
   </div>
-  <button id="fp-pause">⏸</button>
+  <button id="fp-btn" onclick="togglePlay()">⏸</button>
 </div>
 
-<audio id="audio-el" preload="none"></audio>
+<audio id="aud" preload="none"></audio>
 
 <script>
-/* ══════════════════════════════════════════
-   FIREBASE CONFIG — Pegá tus credenciales
-═══════════════════════════════════════════ */
-const firebaseConfig = {
-  apiKey:            "",
-  authDomain:        "",
-  projectId:         "",
-  storageBucket:     "",
-  messagingSenderId: "",
-  appId:             ""
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
-/* ══════ DATA ══════ */
-const DIARIOS = {
-  recientes: [
-    {name:"Infobae",   url:"https://www.infobae.com",          bg:"#f90",    fg:"#fff", text:"inf",       curl:true},
-    {name:"Página/12", url:"https://www.pagina12.com.ar",       bg:"#fff",    fg:"#111", text:"P|12",      curl:true},
-    {name:"Ámbito",    url:"https://www.ambito.com",            bg:"#fff",    fg:"#e8342a", text:"ámbito", curl:true},
-    {name:"El Economista",url:"https://www.eleconomista.com.ar",bg:"#111",   fg:"#aad4f5", text:"El Economista diario", curl:true},
-    {name:"Recor",     url:"https://www.recorderarg.com",       bg:"#e8342a",fg:"#fff", text:"REC",       curl:true},
-  ],
-  general: [
-    {name:"Infobae",   url:"https://www.infobae.com",          bg:"#f90",    fg:"#fff", text:"inf"},
-    {name:"La Nación", url:"https://www.lanacion.com.ar",      bg:"#fff",    fg:"#005ab5", text:"LN"},
-    {name:"Clarín",    url:"https://www.clarin.com",           bg:"#fff",    fg:"#e8342a", text:"Clarín"},
-    {name:"Página/12", url:"https://www.pagina12.com.ar",      bg:"#fff",    fg:"#111", text:"P|12"},
-    {name:"Perfil",    url:"https://www.perfil.com",           bg:"#fff",    fg:"#333", text:"Perfil"},
-    {name:"Crónica",   url:"https://www.cronica.com.ar",       bg:"#e8342a",fg:"#fff", text:"Crónica"},
-    {name:"Diario AR", url:"https://diarioar.com",             bg:"#00518a",fg:"#fff", text:"dAR"},
-    {name:"El Destape",url:"https://www.eldestapeweb.com",     bg:"#1a73e8",fg:"#fff", text:"ElD"},
-  ],
-  econ: [
-    {name:"Ámbito",    url:"https://www.ambito.com",            bg:"#fff",    fg:"#e8342a", text:"ámbito"},
-    {name:"Cronista",  url:"https://www.cronista.com",          bg:"#fff",    fg:"#333",    text:"CRONISTA"},
-    {name:"La Política",url:"https://www.lapoliticaonline.com", bg:"#fff",   fg:"#0056b3", text:"LaPolítica Online"},
-    {name:"El Economista",url:"https://www.eleconomista.com.ar",bg:"#111",  fg:"#aad4f5", text:"El Economista diario"},
-    {name:"IProfesional",url:"https://www.iprofesional.com",   bg:"#e8342a",fg:"#fff",    text:"iP"},
-  ],
-  deportes: [
-    {name:"Olé",       url:"https://www.ole.com.ar",           bg:"#fff",    fg:"#1a7a3a", text:"Olé"},
-    {name:"TyC Sports",url:"https://www.tycsports.com",        bg:"#e8342a",fg:"#fff",    text:"TyC"},
-    {name:"Infobae Dep.",url:"https://www.infobae.com/deportes",bg:"#f90",  fg:"#fff",    text:"inf🏅"},
-    {name:"ESPN",      url:"https://www.espn.com.ar",          bg:"#e8342a",fg:"#fff",    text:"ESPN"},
-  ],
-  intl: [
-    {name:"BBC Mundo", url:"https://www.bbc.com/mundo",        bg:"#bb1919",fg:"#fff",    text:"BBC"},
-    {name:"NYT",       url:"https://www.nytimes.com",          bg:"#fff",    fg:"#111",   text:"NYT"},
-    {name:"Reuters",   url:"https://www.reuters.com",          bg:"#f90",    fg:"#fff",   text:"Reuters"},
-    {name:"El País",   url:"https://www.elpais.com",           bg:"#005ab5",fg:"#fff",    text:"El País"},
-  ],
+/* ══════════════════════════
+   FIREBASE CONFIG
+   Pegá tus credenciales aquí
+══════════════════════════ */
+var FB_CFG = {
+  apiKey:"", authDomain:"", projectId:"",
+  storageBucket:"", messagingSenderId:"", appId:""
 };
 
-const RADIOS = [
-  {id:"mitre",    name:"Radio Mitre", sub:"AM 790",       bg:"#1d3557", fg:"#fff",  text:"MITRE",  stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOMITRE.mp3"},
-  {id:"r10",      name:"Radio 10",   sub:"AM 710",       bg:"#fff",    fg:"#e8342a",text:"R10))",  stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO10AM.mp3"},
-  {id:"la100",    name:"La 100",     sub:"FM 99.9",      bg:"#e8342a", fg:"#fff",   text:"100",    stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/LA100.mp3"},
-  {id:"aspen",    name:"Aspen 102.3",sub:"FM 102.3",     bg:"#111",    fg:"#fff",   text:"ASPEN",  stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/FMASPEN.mp3"},
-  {id:"rivadavia",name:"Rivadavia",  sub:"AM 630",       bg:"#fff",    fg:"#333",   text:"Rivad.", stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_RIVADAVIA.mp3"},
-  {id:"cadena3",  name:"Cadena 3",   sub:"Argentina",    bg:"#1565c0", fg:"#fff",   text:"C3))",   stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/CADENA3AAC.aac"},
-  {id:"rockpop",  name:"Rock & Pop", sub:"FM 95.9",      bg:"#222",    fg:"#f4c430",text:"R&P",    stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/ROCKPOP.mp3"},
-  {id:"los40",    name:"Los 40",     sub:"FM 105.5",     bg:"#ff8c00", fg:"#fff",   text:"40s",    stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40.mp3"},
-  {id:"convos",   name:"Con Vos",    sub:"FM 89.9",      bg:"#1a5276", fg:"#fff",   text:"CON VOS",stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/CONVOSFM.mp3"},
-  {id:"laured",   name:"La Red",     sub:"AM 910",       bg:"#fff",    fg:"#00518a",text:"la red 1",stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/LARED.mp3"},
-  {id:"radiocity",name:"Radio City", sub:"FM 107.1",     bg:"#1a1a1a", fg:"#f4c430",text:"CITY",   stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOCITY.mp3"},
-  {id:"america",  name:"Rdo. América",sub:"AM 1190",     bg:"#fff",    fg:"#111",   text:"RAMERICA",stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOAMERICA.mp3"},
-];
+/* ══ SIMPLE SESSION (localStorage fallback cuando Firebase no está disponible) ══ */
+var loggedIn = false;
 
-const RECENT_RADIO_IDS = ["r10","radiocity","laured","convos","aspen","cadena3","rivadavia","rockpop"];
+function tryFirebase(){
+  try{
+    if(typeof firebase !== 'undefined' && FB_CFG.apiKey){
+      firebase.initializeApp(FB_CFG);
+      var auth = firebase.auth();
+      auth.onAuthStateChanged(function(u){
+        if(u){ onLogin(u.email); }
+        else { showLogin_screen(); }
+      });
+      window._auth = auth;
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
 
-/* ══════ BANNER SLIDES DATA (static; financial updated via Claude API) ══════ */
-const BANNER_SLIDES = [
-  {icon:"☁️", cls:"bi-weather", label:"PRONÓSTICO", val:"Cargando clima…", id:"sl-weather"},
-  {icon:"💵", cls:"bi-dollar",  label:"COTIZACIÓN DÓLAR OFICIAL", val:"Cargando…",  id:"sl-dolar"},
-  {icon:"💶", cls:"bi-euro",    label:"COTIZACIÓN EURO",           val:"Cargando…",  id:"sl-euro"},
-  {icon:"₿",  cls:"bi-btc",     label:"BITCOIN (BTC)",             val:"Cargando…",  id:"sl-btc"},
-  {icon:"💹", cls:"bi-dollar",  label:"DÓLAR BLUE",               val:"Cargando…",  id:"sl-blue"},
-];
+var usingFirebase = false;
 
-/* ══════ DOM ══════ */
-const $ = id => document.getElementById(id);
-const authLoading  = $('auth-loading');
-const loginScreen  = $('login-screen');
-const loginErr     = $('login-err');
-const panelLogin   = $('panel-login');
-const panelReg     = $('panel-register');
-
-/* ══════ AUTH ══════ */
-auth.onAuthStateChanged(user => {
-  authLoading.style.display = 'none';
-  if (user) {
-    loginScreen.classList.add('hidden');
-    setTimeout(()=>loginScreen.style.display='none',400);
-    $('drawer-user').textContent = '👤 ' + (user.email || 'Usuario');
+window.addEventListener('load', function(){
+  // Check localStorage session first (instant, no network needed)
+  var saved = localStorage.getItem('aldiaUser');
+  if(saved){
+    onLogin(saved);
   } else {
-    loginScreen.style.display = '';
-    requestAnimationFrame(()=>loginScreen.classList.remove('hidden'));
+    showLogin_screen();
   }
+  // Try Firebase in background
+  usingFirebase = tryFirebase();
+  buildBanner();
+  buildDiarios();
+  buildRadios();
+  loadFinancial();
 });
 
-/* Toggle panels */
-$('lnk-register').onclick = e => { e.preventDefault(); panelLogin.style.display='none'; panelReg.classList.add('show'); };
-$('lnk-login').onclick    = e => { e.preventDefault(); panelReg.classList.remove('show'); panelLogin.style.display=''; loginErr.textContent=''; };
+function showLogin_screen(){
+  document.getElementById('login').classList.remove('hide');
+}
 
-$('btn-li').onclick = async () => {
-  const email=$('li-email').value.trim(), pass=$('li-pass').value;
-  loginErr.textContent = '';
-  if(!email||!pass){loginErr.textContent='Completá todos los campos.';return;}
-  $('btn-li').textContent='Ingresando…'; $('btn-li').disabled=true;
-  try{ await auth.signInWithEmailAndPassword(email,pass); }
-  catch(e){ loginErr.textContent=mapErr(e.code); }
-  finally{ $('btn-li').textContent='Entrar'; $('btn-li').disabled=false; }
+function onLogin(email){
+  loggedIn = true;
+  document.getElementById('login').classList.add('hide');
+  document.getElementById('duser').textContent = '👤 ' + (email||'Usuario');
+  if(email) localStorage.setItem('aldiaUser', email);
+}
+
+function doLogout(){
+  localStorage.removeItem('aldiaUser');
+  if(usingFirebase && window._auth) window._auth.signOut();
+  loggedIn=false;
+  stopRadio();
+  document.getElementById('login').classList.remove('hide');
+  document.getElementById('lp-login').style.display='';
+  document.getElementById('lp-reg').style.display='none';
+  document.getElementById('l-err').textContent='';
+}
+
+function doLogin(){
+  var em=v('li-em'), pw=v('li-pw');
+  if(!em||!pw){setErr('Completá todos los campos.');return;}
+  if(usingFirebase && window._auth){
+    window._auth.signInWithEmailAndPassword(em,pw)
+      .then(function(r){onLogin(r.user.email);})
+      .catch(function(e){setErr(fberr(e.code));});
+  } else {
+    // Offline mode: accept any email/password (demo)
+    if(pw.length<4){setErr('Contraseña muy corta.');return;}
+    onLogin(em);
+  }
+}
+
+function doReg(){
+  var em=v('reg-em'), pw=v('reg-pw');
+  if(!em||!pw){setErr('Completá todos los campos.');return;}
+  if(pw.length<6){setErr('La contraseña debe tener al menos 6 caracteres.');return;}
+  if(usingFirebase && window._auth){
+    window._auth.createUserWithEmailAndPassword(em,pw)
+      .then(function(r){onLogin(r.user.email);})
+      .catch(function(e){setErr(fberr(e.code));});
+  } else {
+    onLogin(em);
+  }
+}
+
+function showReg(){
+  document.getElementById('lp-login').style.display='none';
+  document.getElementById('lp-reg').style.display='';
+  document.getElementById('l-err').textContent='';
+}
+function showLogin(){
+  document.getElementById('lp-reg').style.display='none';
+  document.getElementById('lp-login').style.display='';
+  document.getElementById('l-err').textContent='';
+}
+
+function v(id){return document.getElementById(id).value.trim();}
+function setErr(t){document.getElementById('l-err').textContent=t;}
+function fberr(c){
+  return({'auth/user-not-found':'Correo no registrado.',
+    'auth/wrong-password':'Contraseña incorrecta.',
+    'auth/email-already-in-use':'Ese correo ya está en uso.',
+    'auth/invalid-email':'Correo no válido.',
+    'auth/too-many-requests':'Demasiados intentos.'}[c]||'Error: '+c);
+}
+
+/* ══ TABS ══ */
+var curTab='diarios';
+function goTab(tab,idx){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  document.getElementById('tab-'+tab).classList.add('on');
+  document.querySelectorAll('.nb').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.nb')[idx].classList.add('on');
+  document.getElementById('nav-bar').style.left=(idx*25)+'%';
+  document.querySelectorAll('.di').forEach(function(d){d.classList.remove('on');});
+  document.querySelectorAll('.di[onclick*="'+tab+'"]').forEach(function(d){d.classList.add('on');});
+  curTab=tab;
+  var titles={diarios:'Al<b>Día</b>',noticias:'Noticias',radios:'Radios',buscar:'Buscar'};
+  document.getElementById('top-title').innerHTML=titles[tab]||'Al<b>Día</b>';
+  if(tab==='noticias' && !newsLoaded) loadNews();
+}
+
+/* ══ DRAWER ══ */
+function openDrw(){
+  document.getElementById('drw').classList.add('on');
+  document.getElementById('ov').classList.add('on');
+}
+function closeDrw(){
+  document.getElementById('drw').classList.remove('on');
+  document.getElementById('ov').classList.remove('on');
+}
+
+/* ══ BANNER DATA ══ */
+var SLIDES=[
+  {id:'sl0',ico:'☁️',cls:'bw',lbl:'PRONÓSTICO',val:'Buenos Aires — cargando…'},
+  {id:'sl1',ico:'💵',cls:'bd',lbl:'DÓLAR OFICIAL',val:'Cargando…'},
+  {id:'sl2',ico:'💹',cls:'bbl',lbl:'DÓLAR BLUE',val:'Cargando…'},
+  {id:'sl3',ico:'💶',cls:'be',lbl:'EURO',val:'Cargando…'},
+  {id:'sl4',ico:'₿', cls:'bb',lbl:'BITCOIN USD',val:'Cargando…'},
+];
+var banIdx=0, banTimer=null;
+
+function buildBanner(){
+  var ban=document.getElementById('banner');
+  var dots=document.getElementById('bdots');
+  SLIDES.forEach(function(s,i){
+    var d=document.createElement('div');
+    d.id=s.id;
+    d.style.cssText='display:flex;align-items:center;gap:10px;width:calc(100% - 80px);'+(i>0?'display:none':'');
+    d.innerHTML='<div class="b-icon '+s.cls+'">'+s.ico+'</div>'
+      +'<div class="b-info"><div class="b-lbl">'+s.lbl+'</div>'
+      +'<div class="b-val" id="'+s.id+'-v">'+s.val+'</div></div>';
+    ban.insertBefore(d,dots);
+    var dot=document.createElement('div');
+    dot.className='dot'+(i===0?' on':'');
+    (function(idx){dot.onclick=function(){goBan(idx);};})(i);
+    dots.appendChild(dot);
+  });
+  banTimer=setInterval(function(){goBan((banIdx+1)%SLIDES.length);},4000);
+}
+
+function goBan(i){
+  document.getElementById(SLIDES[banIdx].id).style.display='none';
+  document.querySelectorAll('.dot')[banIdx].classList.remove('on');
+  banIdx=i;
+  document.getElementById(SLIDES[i].id).style.display='flex';
+  document.querySelectorAll('.dot')[i].classList.add('on');
+}
+
+function setBan(id,txt){
+  var el=document.getElementById(id+'-v');
+  if(el) el.textContent=txt;
+}
+
+/* ══ FINANCIAL + WEATHER (XMLHttpRequest = better WebView compat) ══ */
+function loadFinancial(){
+  xfetch('https://dolarapi.com/v1/dolares/oficial',function(d){
+    if(d&&d.compra) setBan('sl1','COMPRA $'+d.compra.toFixed(1)+'   VENTA $'+d.venta.toFixed(1));
+  });
+  xfetch('https://dolarapi.com/v1/dolares/blue',function(d){
+    if(d&&d.compra) setBan('sl2','COMPRA $'+d.compra.toFixed(1)+'   VENTA $'+d.venta.toFixed(1));
+  });
+  xfetch('https://dolarapi.com/v1/dolares/euro',function(d){
+    if(d&&d.compra) setBan('sl3','COMPRA $'+d.compra.toFixed(1)+'   VENTA $'+d.venta.toFixed(1));
+  });
+  xfetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',function(d){
+    if(d&&d.bitcoin) setBan('sl4','USD $'+d.bitcoin.usd.toLocaleString('es-AR'));
+  });
+  xfetch('https://api.open-meteo.com/v1/forecast?latitude=-34.36&longitude=-58.73&daily=temperature_2m_max,temperature_2m_min&current_weather=true&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=1',function(d){
+    if(d&&d.daily){
+      var mn=d.daily.temperature_2m_min[0].toFixed(1);
+      var mx=d.daily.temperature_2m_max[0].toFixed(1);
+      var wc=d.current_weather.weathercode;
+      var ico=wc===0?'☀️':wc<=3?'⛅':wc<=67?'🌧️':'❄️';
+      document.querySelector('#sl0 .b-icon').textContent=ico;
+      setBan('sl0','GBA — MÍN '+mn+'°C  MÁX '+mx+'°C');
+    }
+  });
+}
+
+function xfetch(url,cb){
+  try{
+    var xhr=new XMLHttpRequest();
+    xhr.open('GET',url,true);
+    xhr.timeout=8000;
+    xhr.onreadystatechange=function(){
+      if(xhr.readyState===4&&xhr.status===200){
+        try{cb(JSON.parse(xhr.responseText));}catch(e){}
+      }
+    };
+    xhr.send();
+  }catch(e){}
+}
+
+setInterval(loadFinancial, 5*60*1000);
+
+/* ══ DIARIOS DATA ══ */
+var DIARIOS={
+  rec:[
+    {n:'Infobae',  u:'https://www.infobae.com',          bg:'#f90',   fg:'#fff',tx:'inf'},
+    {n:'Página/12',u:'https://www.pagina12.com.ar',      bg:'#fff',   fg:'#111',tx:'P|12'},
+    {n:'Ámbito',   u:'https://www.ambito.com',           bg:'#fff',   fg:'#c00',tx:'ámbito'},
+    {n:'El Econ.', u:'https://www.eleconomista.com.ar',  bg:'#0a0a0a',fg:'#8ad',tx:'El\nEconomista'},
+    {n:'Cronista', u:'https://www.cronista.com',         bg:'#fff',   fg:'#333',tx:'CRONISTA'},
+  ],
+  gen:[
+    {n:'Infobae',  u:'https://www.infobae.com',          bg:'#f90',   fg:'#fff',tx:'inf'},
+    {n:'La Nación',u:'https://www.lanacion.com.ar',      bg:'#fff',   fg:'#005ab5',tx:'LN'},
+    {n:'Clarín',   u:'https://www.clarin.com',           bg:'#fff',   fg:'#c00',tx:'Clarín'},
+    {n:'Página/12',u:'https://www.pagina12.com.ar',      bg:'#fff',   fg:'#111',tx:'P|12'},
+    {n:'Perfil',   u:'https://www.perfil.com',           bg:'#fff',   fg:'#333',tx:'Perfil'},
+    {n:'Crónica',  u:'https://www.cronica.com.ar',       bg:'#c00',   fg:'#ff0',tx:'Crónica'},
+    {n:'El Destape',u:'https://www.eldestapeweb.com',    bg:'#1a73e8',fg:'#fff',tx:'ElD'},
+    {n:'Minuto AR',u:'https://www.minutouno.com',        bg:'#111',   fg:'#f90',tx:'M1'},
+  ],
+  eco:[
+    {n:'Ámbito',   u:'https://www.ambito.com',           bg:'#fff',   fg:'#c00',tx:'ámbito'},
+    {n:'Cronista', u:'https://www.cronista.com',         bg:'#fff',   fg:'#333',tx:'CRONISTA'},
+    {n:'La Política',u:'https://www.lapoliticaonline.com',bg:'#fff',  fg:'#005ab5',tx:'LaPolítica\nOnline'},
+    {n:'El Econ.', u:'https://www.eleconomista.com.ar',  bg:'#0a0a0a',fg:'#8ad',tx:'El\nEconomista'},
+    {n:'iProfesional',u:'https://www.iprofesional.com', bg:'#c00',   fg:'#fff',tx:'iP'},
+  ],
+  dep:[
+    {n:'Olé',      u:'https://www.ole.com.ar',           bg:'#fff',   fg:'#1a7a3a',tx:'Olé'},
+    {n:'TyC Sports',u:'https://www.tycsports.com',       bg:'#c00',   fg:'#fff',tx:'TyC'},
+    {n:'ESPN AR',  u:'https://www.espn.com.ar',          bg:'#c00',   fg:'#fff',tx:'ESPN'},
+    {n:'Infobae Dep',u:'https://www.infobae.com/deportes',bg:'#f90',  fg:'#fff',tx:'inf🏅'},
+  ],
+  int:[
+    {n:'BBC Mundo',u:'https://www.bbc.com/mundo',        bg:'#bb1919',fg:'#fff',tx:'BBC'},
+    {n:'NY Times', u:'https://www.nytimes.com',          bg:'#fff',   fg:'#111',tx:'NYT'},
+    {n:'Reuters',  u:'https://www.reuters.com',          bg:'#f90',   fg:'#fff',tx:'Reuters'},
+    {n:'El País',  u:'https://www.elpais.com',           bg:'#005ab5',fg:'#fff',tx:'El País'},
+  ]
 };
 
-$('btn-reg').onclick = async () => {
-  const email=$('reg-email').value.trim(), pass=$('reg-pass').value;
-  loginErr.textContent = '';
-  if(!email||!pass){loginErr.textContent='Completá todos los campos.';return;}
-  if(pass.length<6){loginErr.textContent='La contraseña debe tener al menos 6 caracteres.';return;}
-  $('btn-reg').textContent='Creando…'; $('btn-reg').disabled=true;
-  try{ await auth.createUserWithEmailAndPassword(email,pass); }
-  catch(e){ loginErr.textContent=mapErr(e.code); }
-  finally{ $('btn-reg').textContent='Crear cuenta'; $('btn-reg').disabled=false; }
-};
-
-['li-email','li-pass','reg-email','reg-pass'].forEach(id=>{
-  $(id)&&$(id).addEventListener('keydown',e=>{
-    if(e.key==='Enter'){ id.startsWith('li') ? $('btn-li').click() : $('btn-reg').click(); }
-  });
-});
-
-$('btn-logout').onclick = () => { stopRadio(); auth.signOut(); };
-
-function mapErr(c){
-  return({'auth/user-not-found':'Correo no registrado.','auth/wrong-password':'Contraseña incorrecta.',
-    'auth/invalid-email':'Correo no válido.','auth/email-already-in-use':'Ese correo ya está en uso.',
-    'auth/too-many-requests':'Demasiados intentos. Esperá un momento.'}[c]||'Error: '+c);
-}
-
-/* ══════ DRAWER ══════ */
-const drawerEl  = $('drawer');
-const overlayEl = $('drawer-overlay');
-function openDrawer(){ drawerEl.classList.add('open'); overlayEl.classList.add('open'); }
-function closeDrawer(){ drawerEl.classList.remove('open'); overlayEl.classList.remove('open'); }
-$('btn-menu').onclick = openDrawer;
-overlayEl.onclick     = closeDrawer;
-document.querySelectorAll('.drawer-item[data-tab]').forEach(el=>{
-  el.onclick=()=>{ switchTab(el.dataset.tab); closeDrawer();
-    document.querySelectorAll('.drawer-item').forEach(d=>d.classList.remove('active-nav'));
-    el.classList.add('active-nav');
-  };
-});
-
-/* ══════ BOTTOM NAV ══════ */
-let currentTab='diarios';
-document.querySelectorAll('.nav-btn').forEach(btn=>{
-  btn.onclick=()=>switchTab(btn.dataset.tab,btn);
-});
-
-function switchTab(tab, btn){
-  currentTab=tab;
-  document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
-  const panel=document.getElementById('tab-'+tab);
-  if(panel) panel.style.display='block';
-  document.querySelectorAll('.nav-btn').forEach(b=>{
-    b.classList.toggle('active', b.dataset.tab===tab);
-  });
-  const idx = [...document.querySelectorAll('.nav-btn')].findIndex(b=>b.dataset.tab===tab);
-  $('nav-bar').style.left = (idx*25)+'%';
-  if(tab==='noticias') loadNews();
-  // sync drawer
-  document.querySelectorAll('.drawer-item[data-tab]').forEach(d=>{
-    d.classList.toggle('active-nav',d.dataset.tab===tab);
-  });
-  updateTopTitle(tab);
-}
-
-function updateTopTitle(tab){
-  const map={diarios:'Diarios',noticias:'Noticias',radios:'Radios',buscar:'Buscar'};
-  $('top-title').innerHTML = (map[tab]||'AlDía').replace('AlDía','Al<span style="color:var(--accent)">Día</span>');
-}
-
-/* ══════ BUILD NEWSPAPER LOGO CARDS ══════ */
-function buildLogoCard(d){
-  const a = document.createElement('a');
-  a.className='logo-card'; a.href=d.url; a.target='_self'; a.dataset.name=d.name;
-  const imgDiv=document.createElement('div');
-  imgDiv.className='logo-card-img'+(d.curl?' ':'');
-  imgDiv.style.background=d.bg; imgDiv.style.color=d.fg;
-  imgDiv.style.fontSize=d.text.length>6?'9px':'12px';
-  imgDiv.style.fontWeight='900'; imgDiv.style.textAlign='center';
-  imgDiv.style.lineHeight='1.2'; imgDiv.style.padding='4px';
-  imgDiv.textContent=d.text;
-  const nm=document.createElement('div');
-  nm.className='logo-card-name'; nm.textContent=d.name;
-  a.appendChild(imgDiv); a.appendChild(nm);
+function mkDiario(d){
+  var a=document.createElement('a');
+  a.className='nc'; a.href=d.u; a.target='_self';
+  a.dataset.name=d.n;
+  var fs=d.tx.length>7?'8px':d.tx.length>4?'10px':'13px';
+  a.innerHTML='<div class="nc-img" style="background:'+d.bg+';color:'+d.fg
+    +';font-size:'+fs+'">'+d.tx.replace(/\n/g,'<br>')+'</div>'
+    +'<div class="nc-name">'+d.n+'</div>';
   return a;
 }
 
-function populateDiarios(){
-  const rows={recientes:'recent-row',general:'general-row',econ:'econ-row',deportes:'dep-row',intl:'intl-row'};
-  Object.entries(rows).forEach(([key,rowId])=>{
-    const el=$(rowId); if(!el)return;
-    (DIARIOS[key]||[]).forEach(d=>el.appendChild(buildLogoCard(d)));
+function buildDiarios(){
+  var map={rec:'row-rec',gen:'row-gen',eco:'row-eco',dep:'row-dep',int:'row-int'};
+  Object.keys(map).forEach(function(k){
+    var el=document.getElementById(map[k]);
+    DIARIOS[k].forEach(function(d){el.appendChild(mkDiario(d));});
   });
 }
-populateDiarios();
 
-/* ══════ BUILD RADIO CARDS ══════ */
-function buildRadioCard(r, small){
-  const d=document.createElement('div');
-  d.className='radio-card'; d.dataset.radioId=r.id; d.dataset.name=r.name;
-  const img=document.createElement('div');
-  img.className='radio-card-img'; img.id='rc-'+r.id;
-  img.style.background=r.bg; img.style.color=r.fg;
-  img.style.fontSize=r.text.length>6?'8px':'10px';
-  img.style.fontWeight='900'; img.style.textAlign='center';
-  img.style.padding='4px'; img.style.lineHeight='1.25';
-  img.textContent=r.text;
-  const nm=document.createElement('div');
-  nm.className='radio-card-name'; nm.textContent=r.name;
-  d.appendChild(img); d.appendChild(nm);
-  d.onclick=()=>toggleRadio(r);
+/* ══ RADIOS DATA ══ */
+var RADIOS=[
+  {id:'r10',    n:'Radio 10',   sub:'AM 710',   bg:'#fff',   fg:'#c00', tx:'R10))',  s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO10AM.mp3'},
+  {id:'mitre',  n:'Radio Mitre',sub:'AM 790',   bg:'#1d3557',fg:'#fff', tx:'MITRE', s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOMITRE.mp3'},
+  {id:'city',   n:'Radio City', sub:'FM 107.1', bg:'#111',   fg:'#ff0', tx:'CITY',  s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOCITY.mp3'},
+  {id:'lared',  n:'La Red',     sub:'AM 910',   bg:'#fff',   fg:'#005ab5',tx:'la red 1',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/LARED.mp3'},
+  {id:'convos', n:'Con Vos',    sub:'FM 89.9',  bg:'#1a5276',fg:'#fff', tx:'CON VOS',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/CONVOSFM.mp3'},
+  {id:'cadena3',n:'Cadena 3',   sub:'Argentina',bg:'#1565c0',fg:'#fff', tx:'C3))',  s:'https://playerservices.streamtheworld.com/api/livestream-redirect/CADENA3AAC.aac'},
+  {id:'aspen',  n:'FM Aspen',   sub:'FM 102.3', bg:'#111',   fg:'#fff', tx:'ASPEN', s:'https://playerservices.streamtheworld.com/api/livestream-redirect/FMASPEN.mp3'},
+  {id:'rockpop',n:'Rock & Pop', sub:'FM 95.9',  bg:'#222',   fg:'#f4c430',tx:'R&P',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/ROCKPOP.mp3'},
+  {id:'los40',  n:'Los 40',     sub:'FM 105.5', bg:'#ff8c00',fg:'#fff', tx:'40s',   s:'https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40.mp3'},
+  {id:'rivad',  n:'Rivadavia',  sub:'AM 630',   bg:'#fff',   fg:'#333', tx:'Rivad.',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_RIVADAVIA.mp3'},
+  {id:'la100',  n:'La 100',     sub:'FM 99.9',  bg:'#c00',   fg:'#fff', tx:'100',   s:'https://playerservices.streamtheworld.com/api/livestream-redirect/LA100.mp3'},
+  {id:'america',n:'Rdo. América',sub:'AM 1190', bg:'#fff',   fg:'#111', tx:'RAMÉR.',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOAMERICA.mp3'},
+];
+var REC_IDS=['r10','city','lared','convos','aspen','cadena3','rivad','rockpop'];
+
+function mkRadioCard(r){
+  var d=document.createElement('div');
+  d.className='rc'; d.dataset.id=r.id; d.dataset.name=r.n;
+  var fs=r.tx.length>5?'8px':'10px';
+  d.innerHTML='<div class="rc-img" id="ri-'+r.id+'" style="background:'+r.bg+';color:'+r.fg+';font-size:'+fs+'">'+r.tx+'</div>'
+    +'<div class="rc-name">'+r.n+'</div>';
+  d.onclick=function(){toggleRadio(r);};
   return d;
 }
 
-function populateRadios(){
-  const recentEl=$('recent-radios'), allEl=$('all-radios');
-  RADIOS.filter(r=>RECENT_RADIO_IDS.includes(r.id))
-    .forEach(r=>recentEl.appendChild(buildRadioCard(r)));
-  RADIOS.forEach(r=>allEl.appendChild(buildRadioCard(r)));
-}
-populateRadios();
-
-/* ══════ RADIO SEARCH ══════ */
-$('radio-search').addEventListener('input', e=>{
-  const q=e.target.value.toLowerCase().trim();
-  document.querySelectorAll('#tab-radios .radio-card').forEach(c=>{
-    c.classList.toggle('hidden-card', q && !c.dataset.name.toLowerCase().includes(q));
+function buildRadios(){
+  var recEl=document.getElementById('row-rrec');
+  var allEl=document.getElementById('row-rall');
+  RADIOS.forEach(function(r){
+    allEl.appendChild(mkRadioCard(r));
+    if(REC_IDS.indexOf(r.id)>=0) recEl.appendChild(mkRadioCard(r));
   });
-});
+}
 
-/* ══════ GLOBAL SEARCH ══════ */
-$('global-search').addEventListener('input', e=>{
-  const q=e.target.value.toLowerCase().trim();
-  const res=$('search-results'); res.innerHTML='';
-  if(!q) return;
-  const all=[
-    ...Object.values(DIARIOS).flat().map(d=>({...d,type:'Diario'})),
-    ...RADIOS.map(r=>({name:r.name,url:'#radio-'+r.id,type:'Radio',sub:r.sub})),
-  ].filter(item=>item.name.toLowerCase().includes(q));
-  if(!all.length){res.innerHTML='<div class="news-loading">Sin resultados.</div>';return;}
-  all.forEach(item=>{
-    const c=document.createElement('div');
-    c.className='news-card';
-    c.innerHTML=`<div class="news-cat">${item.type}</div>
-      <div class="news-title">${item.name}</div>
-      <div class="news-src">${item.sub||item.url||''}</div>`;
-    if(item.type==='Diario'){ c.onclick=()=>{ window.location.href=item.url; }; }
+function filterRadios(q){
+  q=q.toLowerCase();
+  document.querySelectorAll('#tab-radios .rc').forEach(function(c){
+    c.classList.toggle('hid', q&&c.dataset.name.toLowerCase().indexOf(q)<0);
+  });
+}
+
+/* ══ GLOBAL SEARCH ══ */
+function globalSearch(q){
+  var res=document.getElementById('gres');
+  res.innerHTML='';
+  if(!q)return;
+  q=q.toLowerCase();
+  var all=[];
+  Object.keys(DIARIOS).forEach(function(k){
+    DIARIOS[k].forEach(function(d){
+      if(d.n.toLowerCase().indexOf(q)>=0)
+        all.push({type:'Diario',name:d.n,url:d.u,sub:d.u});
+    });
+  });
+  RADIOS.forEach(function(r){
+    if(r.n.toLowerCase().indexOf(q)>=0)
+      all.push({type:'Radio',name:r.n,sub:r.sub,rid:r.id});
+  });
+  if(!all.length){res.innerHTML='<div class="n-empty">Sin resultados para "'+q+'"</div>';return;}
+  all.forEach(function(item){
+    var c=document.createElement('div');
+    c.className='ncard';
+    c.innerHTML='<div class="n-cat">'+item.type+'</div>'
+      +'<div class="n-title">'+item.name+'</div>'
+      +'<div class="n-src">'+item.sub+'</div>';
+    if(item.type==='Diario') c.onclick=function(){window.location.href=item.url;};
     else{
-      const rid=item.url.replace('#radio-','');
-      const r=RADIOS.find(x=>x.id===rid);
-      if(r) c.onclick=()=>{ switchTab('radios'); toggleRadio(r); };
+      var rid=item.rid;
+      c.onclick=function(){
+        goTab('radios',2);
+        var r=RADIOS.find(function(x){return x.id===rid;});
+        if(r) toggleRadio(r);
+      };
     }
     res.appendChild(c);
   });
-});
+}
 
-/* ══════ RADIO PLAYER ══════ */
-const audioEl = $('audio-el');
-let currentRadio=null, isPlaying=false;
+/* ══ RADIO PLAYER ══ */
+var aud=document.getElementById('aud');
+var curRadio=null, playing=false;
 
 function toggleRadio(r){
-  if(currentRadio&&currentRadio.id===r.id&&isPlaying){ pauseRadio(); return; }
-  playRadio(r);
+  if(curRadio&&curRadio.id===r.id&&playing){pauseRad();return;}
+  playRad(r);
 }
 
-function playRadio(r){
+function playRad(r){
   stopRadio(false);
-  currentRadio=r; isPlaying=true;
-  audioEl.src=r.stream; audioEl.load();
-  audioEl.play().catch(()=>{});
-  // highlight all instances of this radio card
-  document.querySelectorAll('.radio-card-img').forEach(el=>{
-    el.classList.toggle('playing-card',el.id==='rc-'+r.id);
+  curRadio=r; playing=true;
+  aud.src=r.s; aud.load(); aud.play();
+  document.querySelectorAll('.rc-img').forEach(function(el){
+    el.classList.toggle('playing', el.id==='ri-'+r.id);
   });
-  $('fp-name').textContent=r.name;
-  $('fp-sub').textContent=r.sub+' · En vivo';
-  $('fp-logo').style.background=r.bg;
-  $('fp-logo').style.color=r.fg;
-  $('fp-logo').textContent=r.text;
-  $('fp-pause').textContent='⏸';
-  $('fp-bars').classList.remove('paused');
-  $('float-player').classList.add('visible');
+  document.getElementById('fp-logo').style.cssText='background:'+r.bg+';color:'+r.fg+';font-size:'+(r.tx.length>5?'8px':'10px');
+  document.getElementById('fp-logo').textContent=r.tx;
+  document.getElementById('fp-name').textContent=r.n;
+  document.getElementById('fp-sub').textContent=r.sub+' · En vivo';
+  document.getElementById('fp-btn').textContent='⏸';
+  document.getElementById('fp-bars').classList.remove('psd');
+  document.getElementById('fplayer').classList.add('on');
 }
 
-function pauseRadio(){
-  audioEl.pause(); isPlaying=false;
-  $('fp-pause').textContent='▶';
-  $('fp-bars').classList.add('paused');
+function pauseRad(){
+  aud.pause(); playing=false;
+  document.getElementById('fp-btn').textContent='▶';
+  document.getElementById('fp-bars').classList.add('psd');
 }
 
-function stopRadio(hide=true){
-  audioEl.pause(); audioEl.src=''; isPlaying=false; currentRadio=null;
-  document.querySelectorAll('.radio-card-img').forEach(el=>el.classList.remove('playing-card'));
-  if(hide) $('float-player').classList.remove('visible');
+function stopRadio(hide){
+  aud.pause(); aud.src=''; playing=false; curRadio=null;
+  document.querySelectorAll('.rc-img').forEach(function(el){el.classList.remove('playing');});
+  if(hide!==false) document.getElementById('fplayer').classList.remove('on');
 }
 
-$('fp-pause').onclick=()=>{
-  if(isPlaying){ pauseRadio(); }
-  else if(currentRadio){ audioEl.play().catch(()=>{}); isPlaying=true; $('fp-pause').textContent='⏸'; $('fp-bars').classList.remove('paused'); }
-};
-audioEl.addEventListener('ended',()=>stopRadio());
-
-/* ══════ INFO BANNER ══════ */
-const bannerEl = $('info-banner');
-const dotsEl   = $('banner-dots');
-let bannerIdx  = 0, bannerTimer=null;
-
-// Build slides
-BANNER_SLIDES.forEach((s,i)=>{
-  const div=document.createElement('div');
-  div.className='banner-slide'+(i>0?' hidden-slide':'');
-  div.id=s.id;
-  div.innerHTML=`
-    <div class="banner-icon ${s.cls}">${s.icon}</div>
-    <div class="banner-info">
-      <div class="banner-label">${s.label}</div>
-      <div class="banner-value" id="${s.id}-val">${s.val}</div>
-    </div>`;
-  bannerEl.insertBefore(div,dotsEl);
-
-  const dot=document.createElement('div');
-  dot.className='bdot'+(i===0?' active':'');
-  dot.onclick=()=>goBanner(i);
-  dotsEl.appendChild(dot);
-});
-
-function goBanner(idx){
-  document.querySelectorAll('.banner-slide').forEach((s,i)=>s.classList.toggle('hidden-slide',i!==idx));
-  document.querySelectorAll('.bdot').forEach((d,i)=>d.classList.toggle('active',i===idx));
-  bannerIdx=idx;
+function togglePlay(){
+  if(playing){pauseRad();}
+  else if(curRadio){aud.play();playing=true;
+    document.getElementById('fp-btn').textContent='⏸';
+    document.getElementById('fp-bars').classList.remove('psd');}
 }
+aud.onended=function(){stopRadio();};
 
-function nextBanner(){ goBanner((bannerIdx+1)%BANNER_SLIDES.length); }
-bannerTimer=setInterval(nextBanner,4000);
+/* ══ NOTICIAS (Claude API) ══ */
+var newsLoaded=false;
 
-/* ══════ FETCH FINANCIAL + WEATHER DATA ══════ */
-async function loadFinancialData(){
-  // Dollar oficial — dolarito API (CORS-friendly)
-  try{
-    const r=await fetch('https://dolarapi.com/v1/dolares/oficial');
-    const d=await r.json();
-    $('sl-dolar-val').textContent=`COMPRA $${d.compra.toFixed(1)}  VENTA $${d.venta.toFixed(1)}`;
-  }catch(e){}
+function loadNews(){
+  var msg=document.getElementById('news-msg');
+  var list=document.getElementById('news-list');
+  msg.textContent='⏳ Cargando noticias del día…';
+  msg.style.display='block';
+  list.innerHTML='';
 
-  // Dólar blue
-  try{
-    const r=await fetch('https://dolarapi.com/v1/dolares/blue');
-    const d=await r.json();
-    $('sl-blue-val').textContent=`COMPRA $${d.compra.toFixed(1)}  VENTA $${d.venta.toFixed(1)}`;
-  }catch(e){}
+  var body=JSON.stringify({
+    model:'claude-sonnet-4-6',
+    max_tokens:1000,
+    messages:[{role:'user',content:'Generá un JSON con las 12 noticias más importantes de hoy para Argentina e internacional. Responde SOLO con un array JSON válido, sin markdown, sin backticks. Formato: [{"cat":"POLÍTICA","title":"Titular breve","src":"Fuente","url":"https://..."},...]. Incluí política argentina, economía, dólar, internacional, ciencia/tecnología, deportes.'}]
+  });
 
-  // Euro
-  try{
-    const r=await fetch('https://dolarapi.com/v1/dolares/euro');
-    const d=await r.json();
-    $('sl-euro-val').textContent=`COMPRA $${d.compra.toFixed(1)}  VENTA $${d.venta.toFixed(1)}`;
-  }catch(e){}
-
-  // Bitcoin via coingecko (no key needed)
-  try{
-    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
-    const d=await r.json();
-    const p=d.bitcoin.usd;
-    $('sl-btc-val').textContent=`USD $${p.toLocaleString('es-AR')}`;
-  }catch(e){}
-
-  // Weather — Open-Meteo (no key, free)
-  try{
-    // Default: Buenos Aires, GBA
-    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=-34.52&longitude=-58.73&daily=temperature_2m_max,temperature_2m_min,weathercode&current_weather=true&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=1');
-    const d=await r.json();
-    const mn=d.daily.temperature_2m_min[0].toFixed(1);
-    const mx=d.daily.temperature_2m_max[0].toFixed(1);
-    const wc=d.current_weather.weathercode;
-    const icon=wcode(wc);
-    document.querySelector('#sl-weather .banner-icon').textContent=icon;
-    $('sl-weather-val').textContent=`GBA — MIN ${mn}°C — MÁX ${mx}°C`;
-  }catch(e){}
+  var xhr=new XMLHttpRequest();
+  xhr.open('POST','https://api.anthropic.com/v1/messages',true);
+  xhr.setRequestHeader('Content-Type','application/json');
+  xhr.timeout=20000;
+  xhr.onreadystatechange=function(){
+    if(xhr.readyState!==4)return;
+    if(xhr.status===200){
+      try{
+        var data=JSON.parse(xhr.responseText);
+        var raw=data.content.map(function(x){return x.text||'';}).join('').trim();
+        var arr=JSON.parse(raw.replace(/```json|```/g,'').trim());
+        msg.style.display='none';
+        arr.forEach(function(n){
+          var c=document.createElement('div');
+          c.className='ncard';
+          c.innerHTML='<div class="n-cat">'+n.cat+'</div>'
+            +'<div class="n-title">'+n.title+'</div>'
+            +'<div class="n-src">'+n.src+'  ·  <span style="color:#1a73e8">Ver →</span></div>';
+          if(n.url&&n.url.indexOf('http')===0) c.onclick=function(){window.location.href=n.url;};
+          list.appendChild(c);
+        });
+        newsLoaded=true;
+      }catch(e){
+        msg.textContent='⚠️ No se pudieron procesar las noticias. Tocá para reintentar.';
+        msg.onclick=function(){newsLoaded=false;loadNews();};
+      }
+    } else {
+      msg.textContent='⚠️ Sin conexión. Tocá para reintentar.';
+      msg.onclick=function(){newsLoaded=false;loadNews();};
+    }
+  };
+  xhr.send(body);
 }
-loadFinancialData();
-setInterval(loadFinancialData,5*60*1000);
-
-function wcode(c){
-  if(c===0)return'☀️';if(c<=3)return'⛅';if(c<=67)return'🌧️';
-  if(c<=77)return'❄️';if(c<=82)return'🌧️';return'⛈️';
-}
-
-/* ══════ NOTICIAS — via Claude API ══════ */
-let newsLoaded=false;
-async function loadNews(){
-  if(newsLoaded)return;
-  $('news-loading').style.display='block';
-  $('news-list').innerHTML='';
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-6',
-        max_tokens:1000,
-        messages:[{role:'user',content:`Generá un JSON con las 12 noticias más importantes de hoy para Argentina e internacional.
-Responde SOLO con un array JSON válido, sin markdown, sin backticks, sin texto previo.
-Formato exacto:
-[{"cat":"POLÍTICA","title":"Título corto de la noticia","src":"Fuente","url":"https://..."},...]
-Incluí noticias de: política argentina, economía, dólar, internacional, ciencia, deportes.
-Fecha de referencia: ${new Date().toLocaleDateString('es-AR')}`}]
-      })
-    });
-    const data=await resp.json();
-    const raw=data.content.map(x=>x.text||'').join('').trim();
-    const arr=JSON.parse(raw.replace(/```json|```/g,'').trim());
-    $('news-loading').style.display='none';
-    arr.forEach(n=>{
-      const div=document.createElement('div');
-      div.className='news-card';
-      div.innerHTML=`
-        <div class="news-cat">${n.cat||'GENERAL'}</div>
-        <div class="news-title">${n.title}</div>
-        <div class="news-src"><span>${n.src||''}</span><span class="news-dot"></span><span style="color:var(--accent2);font-size:10px">Ver nota →</span></div>`;
-      if(n.url&&n.url.startsWith('http')) div.onclick=()=>{ window.location.href=n.url; };
-      $('news-list').appendChild(div);
-    });
-    newsLoaded=true;
-  }catch(e){
-    $('news-loading').textContent='No se pudieron cargar las noticias. Tocá para reintentar.';
-    $('news-loading').onclick=()=>{ newsLoaded=false; loadNews(); };
-  }
-}
-
-/* ══════ SETTINGS / BOOKMARK stubs ══════ */
-$('btn-settings').onclick=()=>alert('Configuración próximamente.');
-$('btn-bookmark').onclick=()=>alert('Guardados próximamente.');
-$('drawer-config').onclick=()=>{ closeDrawer(); alert('Configuración próximamente.'); };
-
-/* ══════ INIT ══════ */
-document.getElementById('tab-diarios').style.display='block';
 </script>
 </body>
 </html>
