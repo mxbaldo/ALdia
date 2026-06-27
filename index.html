@@ -3,982 +3,1092 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-<title>AlDia</title>
+<title>AlDía</title>
 <style>
+/* ═══════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%;background:#111}
 body{height:100%;background:#111;color:#fff;
-  font-family:Arial,Helvetica,sans-serif;overflow:hidden}
+  font-family:Arial,Helvetica,sans-serif;
+  overflow:hidden;user-select:none;font-size:14px}
 ::-webkit-scrollbar{display:none}
 
-:root{
-  --acc:#e8342a;--blue:#1a73e8;--green:#2e7d32;
-  --bg:#111;--s1:#1c1e24;--s2:#252830;--muted:#9aa0b0;
-  --top:52px;--ban:58px;--nav:60px;
+/* ═══════════════════════════════════
+   LAYOUT SHELL
+═══════════════════════════════════ */
+#shell{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  background:#111;
 }
 
-/* ══ LAYOUT SHELL ══ */
-#shell{position:fixed;inset:0;display:flex;flex-direction:column}
-#topbar{flex-shrink:0;height:var(--top);background:#1c1e24;
-  border-bottom:1px solid #252830;
-  display:flex;align-items:center;padding:0 12px;gap:10px;z-index:40}
-#banner{flex-shrink:0;height:var(--ban);background:#1c1e24;
-  border-bottom:1px solid #252830;
-  display:flex;align-items:center;padding:0 12px;gap:10px;overflow:hidden;
-  position:relative}
-#content{flex:1;overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;padding:12px}
-#bottomnav{flex-shrink:0;height:var(--nav);background:#16181f;
-  border-top:1px solid #252830;
-  display:flex;position:relative}
+/* ═══ TOP BAR ═══ */
+#topbar{
+  flex-shrink:0;
+  height:50px;
+  background:#1a1d26;
+  border-bottom:1px solid #2a2d38;
+  display:flex;align-items:center;
+  padding:0 12px;gap:10px;
+  z-index:100;
+}
+#btn-ham{font-size:22px;cursor:pointer;width:30px;text-align:center;flex-shrink:0}
+#top-ttl{flex:1;font-size:18px;font-weight:900;letter-spacing:-.3px}
+#top-ttl em{color:#e8342a;font-style:normal}
+.t-ico{font-size:18px;cursor:pointer;color:#888;flex-shrink:0}
 
-/* ══ TOPBAR ══ */
-#top-title{flex:1;font-size:19px;font-weight:900;letter-spacing:-.5px}
-#top-title em{color:var(--acc);font-style:normal}
-.ti{cursor:pointer;display:flex;align-items:center;color:var(--muted)}
-
-/* ══ SVG ICONS ══ */
-svg{display:block}
-
-/* ══ BANNER ══ */
+/* ═══ BANNER ROTATIVO ═══ */
+#banner{
+  flex-shrink:0;height:56px;
+  background:#1a1d26;
+  border-bottom:1px solid #22252f;
+  display:flex;align-items:center;
+  padding:0 10px;gap:8px;overflow:hidden;
+  position:relative;
+}
 .bslide{
-  display:none;align-items:center;gap:10px;
-  flex:1;min-width:0}
-.bslide.on{display:flex}
-.bico{width:36px;height:36px;border-radius:50%;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center}
-.bico.w{background:#1a73e8}.bico.d{background:#1a7a3a}
-.bico.b{background:#555}.bico.e{background:#7b3fa0}.bico.btc{background:#f7931a}
-.blbl{font-size:10px;font-weight:700;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.5px}
-.bval{font-size:13px;font-weight:800;white-space:nowrap;
-  overflow:hidden;text-overflow:ellipsis}
-.bdots{display:flex;gap:5px;flex-shrink:0}
-.dot{width:7px;height:7px;border-radius:50%;background:#333;cursor:pointer}
-.dot.on{background:var(--acc)}
+  position:absolute;left:10px;right:50px;
+  display:flex;align-items:center;gap:10px;
+  transition:opacity .4s,transform .4s;
+}
+.bslide.off{opacity:0;transform:translateX(30px);pointer-events:none}
+.b-ico{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;flex-shrink:0;
+}
+.bw{background:#1565c0}.bd{background:#2e7d32}
+.be{background:#6a1b9a}.bb{background:#e65100}.bbl{background:#37474f}
+.b-txt{flex:1;min-width:0}
+.b-lbl{font-size:9px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px}
+.b-val{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bdots{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  display:flex;gap:4px;flex-direction:column;
+}
+.bdot{width:6px;height:6px;border-radius:50%;background:#444;cursor:pointer}
+.bdot.on{background:#e8342a}
 
-/* ══ BOTTOM NAV ══ */
-#navbar-line{position:absolute;top:0;height:2px;background:var(--acc);
-  width:20%;border-radius:0 0 3px 3px;transition:left .22s}
-.nb{flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:3px;border:none;background:transparent;
-  cursor:pointer;color:var(--muted);font-size:9px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.3px}
-.nb.on{color:var(--acc)}
-.nb.on svg path,.nb.on svg rect,.nb.on svg circle,.nb.on svg polyline,
-.nb.on svg line,.nb.on svg polygon{stroke:var(--acc)}
-.nb svg path,.nb svg rect,.nb svg circle{stroke:var(--muted)}
+/* ═══ CONTENT AREA ═══ */
+#content{
+  flex:1;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:10px 10px 6px;
+  /* critical: allow scrolling on android webview */
+  position:relative;
+}
 
-/* ══ TABS ══ */
+/* ═══ TABS ═══ */
 .tab{display:none}
 .tab.on{display:block}
 
-/* ══ SECTION HEADER ══ */
+/* ═══ SECTION HEADERS ═══ */
 .sec{margin-bottom:16px}
-.sec-h{font-size:11px;font-weight:800;text-transform:uppercase;
-  letter-spacing:.5px;color:#fff;margin-bottom:9px;
-  display:flex;align-items:baseline;gap:5px}
-.sec-h span{color:var(--muted);font-weight:600}
+.sec-h{
+  font-size:11px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.6px;color:#ddd;margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.sec-h small{color:#666;font-size:10px;font-weight:600}
 
-/* ══ HORIZONTAL SCROLL — NEWSPAPERS ══ */
-.hscroll{display:flex;gap:9px;overflow-x:auto;
-  -webkit-overflow-scrolling:touch;padding-bottom:4px}
-.nc{flex-shrink:0;width:84px;display:flex;flex-direction:column;
-  align-items:center;gap:4px;cursor:pointer;text-decoration:none;color:#fff}
-.nc-img{width:84px;height:64px;border-radius:9px;border:1.5px solid #2a2c34;
+/* ═══ HORIZONTAL SCROLL (Diarios) ═══ */
+.hrow{
+  display:flex;gap:8px;
+  overflow-x:auto;overflow-y:visible;
+  padding-bottom:4px;
+  -webkit-overflow-scrolling:touch;
+}
+/* Newspaper logo card */
+.dcard{
+  flex-shrink:0;width:82px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  cursor:pointer;text-decoration:none;color:#fff;
+}
+.dcard-img{
+  width:82px;height:60px;border-radius:8px;
   display:flex;align-items:center;justify-content:center;
   font-weight:900;text-align:center;line-height:1.2;padding:4px;
-  position:relative;overflow:hidden}
-.nc-img::after{content:'';position:absolute;bottom:0;right:0;
+  border:1.5px solid #2a2d38;position:relative;overflow:hidden;
+  font-size:11px;
+}
+/* page curl */
+.dcard-img::after{
+  content:'';position:absolute;bottom:0;right:0;
   width:12px;height:12px;
-  background:linear-gradient(135deg,#bbb 40%,rgba(0,0,0,.05) 40%)}
-.nc-nm{font-size:9px;color:var(--muted);text-align:center;max-width:84px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  background:linear-gradient(135deg,#aaa 40%,rgba(255,255,255,0) 40%);
+}
+.dcard-nm{font-size:9px;color:#777;text-align:center;
+  max-width:82px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* ══ RADIO GRID ══ */
-.rgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
-.rc{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
-.rc-img{width:100%;aspect-ratio:1/1;border-radius:9px;border:2px solid transparent;
-  display:flex;align-items:center;justify-content:center;
-  font-weight:900;text-align:center;padding:3px;line-height:1.2;font-size:9px}
-.rc-img.pl{border-color:var(--blue)!important}
-.rc-nm{font-size:9px;color:var(--muted);text-align:center;width:100%;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hid{display:none!important}
-
-/* ══ SEARCH BAR ══ */
-.srch{display:flex;align-items:center;gap:8px;background:#252830;
-  border:1.5px solid #2a2c34;border-radius:22px;
-  padding:9px 14px;margin-bottom:13px}
-.srch input{flex:1;background:transparent;border:none;outline:none;
-  font-size:13px;color:#fff}
-.srch input::placeholder{color:#555}
-
-/* ══ NEWS CARDS ══ */
-.ncard{background:#1c1e24;border-radius:10px;border:1px solid #252830;
-  padding:12px;margin-bottom:8px;cursor:pointer;
-  display:flex;flex-direction:column;gap:5px}
+/* ═══ NEWS CARDS ═══ */
+.ncard{
+  background:#1a1d26;border-radius:10px;
+  border:1px solid #252830;padding:12px;
+  margin-bottom:8px;cursor:pointer;
+}
 .ncard:active{background:#252830}
-.n-cat{font-size:9px;font-weight:800;text-transform:uppercase;
-  letter-spacing:.6px;color:var(--acc)}
-.n-title{font-size:13px;font-weight:700;line-height:1.35;color:#fff}
-.n-src{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px}
-.n-arrow{color:var(--blue);font-size:10px;font-weight:700}
-.n-loading{text-align:center;color:var(--muted);font-size:12px;padding:24px 0}
-.n-btn{width:100%;padding:12px;background:var(--blue);
-  color:#fff;border:none;border-radius:9px;font-size:13px;
-  font-weight:700;cursor:pointer;margin-bottom:14px}
+.n-cat{
+  font-size:9px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.6px;color:#e8342a;margin-bottom:4px;
+}
+.n-ttl{font-size:13px;font-weight:700;line-height:1.35;margin-bottom:5px;color:#fff}
+.n-meta{font-size:10px;color:#666;display:flex;align-items:center;gap:6px}
+.n-dot{width:3px;height:3px;border-radius:50%;background:#555}
+.n-src{color:#888}
+.n-link{color:#1a73e8;font-weight:600}
+.n-loading{text-align:center;color:#666;font-size:13px;padding:24px 0}
+.n-retry{color:#1a73e8;cursor:pointer;text-decoration:underline;margin-left:6px}
 
-/* ══ BLOC DE NOTAS ══ */
-#notepad-area{display:flex;flex-direction:column;height:100%;gap:10px}
-#notepad-area textarea{
-  flex:1;background:#1c1e24;border:1.5px solid #2a2c34;
-  border-radius:10px;padding:14px;font-size:14px;color:#fff;
-  resize:none;outline:none;line-height:1.6;
-  min-height:300px;font-family:Arial,sans-serif}
-#notepad-area textarea:focus{border-color:var(--blue)}
-.note-btns{display:flex;gap:8px;flex-shrink:0}
-.note-btn{flex:1;padding:11px;border:none;border-radius:9px;
-  font-size:12px;font-weight:700;cursor:pointer}
-.note-save{background:var(--blue);color:#fff}
-.note-clear{background:#252830;color:var(--muted);border:1.5px solid #2a2c34}
-.note-saved{color:#4caf50;font-size:11px;text-align:center;margin-top:2px}
-
-/* ══ INTERNAL WEBVIEW (overlay) ══ */
-#webview-overlay{
-  position:fixed;inset:0;z-index:100;background:#111;
-  display:flex;flex-direction:column;
-  transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
-#webview-overlay.open{transform:translateX(0)}
-#wv-top{height:var(--top);background:#1c1e24;
-  border-bottom:1px solid #252830;
-  display:flex;align-items:center;gap:10px;padding:0 12px;flex-shrink:0}
-#wv-title{flex:1;font-size:13px;font-weight:700;color:#fff;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#wv-controls{display:flex;gap:10px}
-.wv-btn{background:transparent;border:none;
-  color:var(--muted);cursor:pointer;padding:4px;
-  display:flex;align-items:center}
-#wv-frame{flex:1;width:100%;border:none;background:#fff}
-#wv-loading{position:absolute;top:var(--top);left:0;right:0;
-  height:3px;background:var(--acc);
-  transform-origin:left;animation:wvload 1.5s ease infinite}
-@keyframes wvload{0%{transform:scaleX(0)}70%{transform:scaleX(.8)}100%{transform:scaleX(1)}}
-#wv-loading.done{display:none}
-
-/* ══ DRAWER ══ */
-#drw-ov{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);
-  opacity:0;pointer-events:none;transition:opacity .22s}
-#drw-ov.on{opacity:1;pointer-events:all}
-#drw{position:fixed;top:0;left:0;bottom:0;width:72%;max-width:260px;
-  background:#1c1e24;z-index:61;
-  transform:translateX(-100%);transition:transform .25s;
-  display:flex;flex-direction:column}
-#drw.on{transform:translateX(0)}
-.dh{background:var(--acc);padding:28px 16px 16px}
-.dh-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px}
-.dh-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
-.drw-body{flex:1;overflow-y:auto;padding:8px 0}
-.di{display:flex;align-items:center;gap:12px;padding:13px 16px;
-  font-size:13px;font-weight:600;cursor:pointer;
-  border-left:3px solid transparent;color:#ccc}
-.di:active{background:#252830}
-.di.on{border-left-color:var(--acc);color:var(--acc);background:#1f2028}
-.ddiv{height:1px;background:#252830;margin:6px 16px}
-.drw-foot{padding:14px 16px;border-top:1px solid #252830}
-.duser{font-size:11px;color:var(--muted);margin-bottom:8px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.drw-btn{width:100%;padding:10px;background:transparent;
-  border:1.5px solid #333;color:var(--muted);border-radius:8px;
-  font-size:12px;font-weight:600;cursor:pointer}
-.drw-btn:active{border-color:var(--acc);color:var(--acc)}
-
-/* ══ LOGIN MODAL ══ */
-#login-modal{
-  position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.85);
-  display:none;align-items:center;justify-content:center;padding:20px}
-#login-modal.open{display:flex}
-.lbox{width:100%;max-width:320px;background:#1c1e24;
-  border-radius:14px;padding:22px 18px;border:1px solid #252830}
-.lbox h2{font-size:16px;font-weight:700;margin-bottom:16px;color:#fff}
-.lfld{margin-bottom:11px}
-.lfld label{display:block;font-size:9px;font-weight:700;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-.lfld input{width:100%;background:#0d0f14;border:1.5px solid #2e3040;
-  border-radius:8px;padding:11px 12px;font-size:14px;color:#fff;
-  outline:none;-webkit-appearance:none}
-.lfld input:focus{border-color:var(--blue)}
-.lfld input::placeholder{color:#444}
-.l-btns{display:flex;gap:8px;margin-top:6px}
-.l-btns button{flex:1;padding:12px;border:none;border-radius:8px;
-  font-size:13px;font-weight:700;cursor:pointer}
-.lb-in{background:var(--acc);color:#fff}
-.lb-sk{background:#252830;color:var(--muted)}
-#l-err{font-size:11px;color:#ff6b6b;text-align:center;
-  min-height:16px;margin-top:8px}
-.l-reg{text-align:center;margin-top:10px;font-size:11px;color:var(--muted)}
-.l-reg a{color:var(--blue);text-decoration:none;font-weight:700;cursor:pointer}
-
-/* ══ FLOAT PLAYER ══ */
-#fpl{
-  position:fixed;left:10px;right:10px;
-  bottom:calc(var(--nav) + 8px);
-  background:#1565c0;border-radius:12px;
-  display:flex;align-items:center;gap:10px;padding:10px 12px;
-  z-index:50;box-shadow:0 4px 20px rgba(21,101,192,.45);
-  transform:translateY(140%);transition:transform .27s}
-#fpl.on{transform:translateY(0)}
-#fpl-logo{width:42px;height:42px;border-radius:7px;flex-shrink:0;
+/* ═══ RADIO GRID ═══ */
+.rgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:4px}
+.rcard{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.rcard-img{
+  width:100%;aspect-ratio:1/1;border-radius:8px;
+  border:2px solid transparent;
   display:flex;align-items:center;justify-content:center;
-  font-size:9px;font-weight:900;text-align:center;overflow:hidden}
-#fpl-info{flex:1;min-width:0}
-.fpbars{display:flex;gap:2px;align-items:flex-end;height:12px;margin-bottom:2px}
-.fpb{width:3px;border-radius:2px;background:#76c7f0;animation:fba .8s ease infinite}
-.fpb:nth-child(1){height:5px;animation-delay:0s}
-.fpb:nth-child(2){height:10px;animation-delay:.15s}
-.fpb:nth-child(3){height:7px;animation-delay:.3s}
-.fpb:nth-child(4){height:12px;animation-delay:.1s}
-.fpb:nth-child(5){height:4px;animation-delay:.25s}
-@keyframes fba{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.3)}}
-.fpbars.psd .fpb{animation:none;transform:scaleY(.3)}
-#fpl-name{font-size:13px;font-weight:800;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
-#fpl-sub{font-size:10px;color:rgba(255,255,255,.6)}
-#fpl-btn{width:42px;height:42px;border-radius:50%;background:#2e7d32;
-  border:none;color:#fff;cursor:pointer;display:flex;
-  align-items:center;justify-content:center;flex-shrink:0}
+  font-weight:900;text-align:center;padding:3px;
+  line-height:1.2;font-size:9px;
+}
+.rcard-img.playing{border-color:#1a73e8 !important}
+.rcard-nm{font-size:9px;color:#777;text-align:center;
+  width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hid{display:none !important}
+.srch-box{
+  display:flex;align-items:center;gap:8px;
+  background:#1a1d26;border:1.5px solid #252830;
+  border-radius:20px;padding:8px 13px;margin-bottom:12px;
+}
+.srch-box input{
+  flex:1;background:transparent;border:none;outline:none;
+  font-size:13px;color:#fff;
+}
+.srch-box input::placeholder{color:#444}
+
+/* ═══ NOTEPAD ═══ */
+#notepad-area{
+  width:100%;
+  min-height:200px;
+  height:calc(100% - 80px);
+  background:#1a1d26;
+  border:1.5px solid #252830;
+  border-radius:10px;
+  padding:12px;
+  font-size:14px;
+  color:#fff;
+  line-height:1.6;
+  resize:none;
+  outline:none;
+  font-family:Arial,sans-serif;
+  -webkit-appearance:none;
+}
+#notepad-area::placeholder{color:#444}
+.note-toolbar{
+  display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;
+}
+.note-btn{
+  padding:7px 12px;border:1.5px solid #2a2d38;
+  background:#1a1d26;color:#ddd;border-radius:7px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:4px;
+}
+.note-btn:active{background:#252830}
+.note-saved{color:#43a047;font-size:11px;font-weight:600}
+
+/* ═══ BOTTOM NAV ═══ */
+#botnav{
+  flex-shrink:0;
+  height:52px;
+  background:#12141c;
+  border-top:1px solid #1e2130;
+  display:flex;
+  position:relative;
+}
+.nb{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
+  border:none;background:transparent;cursor:pointer;
+  color:#555;font-size:9px;font-weight:700;
+  letter-spacing:.2px;padding:0;
+}
+.nb .ni{font-size:16px;line-height:1.1}
+.nb.on{color:#e8342a}
+.nb.on .ni{transform:scale(1.1)}
+#navind{
+  position:absolute;top:0;height:2px;
+  background:#e8342a;border-radius:0 0 3px 3px;
+  width:20%;transition:left .22s;
+}
+
+/* ═══ FLOATING PLAYER ═══ */
+#fplay{
+  position:fixed;left:8px;right:8px;
+  bottom:58px;
+  background:#1565c0;border-radius:12px;
+  display:flex;align-items:center;gap:10px;padding:9px 11px;
+  z-index:250;box-shadow:0 4px 20px rgba(21,101,192,.5);
+  transform:translateY(200%);transition:transform .28s;
+}
+#fplay.on{transform:translateY(0)}
+#fp-logo{
+  width:40px;height:40px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:900;text-align:center;flex-shrink:0;
+}
+#fp-info{flex:1;min-width:0}
+.fp-bars{display:flex;gap:2px;align-items:flex-end;height:11px;margin-bottom:2px}
+.fp-b{width:3px;background:#76c7f0;border-radius:2px;animation:fb .8s ease infinite}
+.fp-b:nth-child(1){height:4px;animation-delay:0s}
+.fp-b:nth-child(2){height:10px;animation-delay:.15s}
+.fp-b:nth-child(3){height:6px;animation-delay:.3s}
+.fp-b:nth-child(4){height:11px;animation-delay:.08s}
+.fp-b:nth-child(5){height:4px;animation-delay:.22s}
+@keyframes fb{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.3)}}
+.fp-bars.psd .fp-b{animation:none;transform:scaleY(.3)}
+#fp-nm{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#fp-sb{font-size:10px;color:rgba(255,255,255,.6)}
+#fp-btn{
+  width:40px;height:40px;border-radius:50%;
+  background:#43a047;border:none;color:#fff;
+  font-size:18px;cursor:pointer;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0;
+}
+
+/* ═══ INTERNAL BROWSER ═══ */
+#browser{
+  position:fixed;inset:0;z-index:200;
+  background:#111;display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .25s;
+}
+#browser.on{transform:translateX(0)}
+#br-bar{
+  flex-shrink:0;height:50px;background:#1a1d26;
+  border-bottom:1px solid #2a2d38;
+  display:flex;align-items:center;padding:0 8px;gap:6px;
+}
+#br-back{font-size:20px;cursor:pointer;padding:4px 8px;color:#ddd}
+#br-fwd {font-size:20px;cursor:pointer;padding:4px 8px;color:#888}
+#br-home{font-size:18px;cursor:pointer;padding:4px 8px;color:#888}
+#br-url{
+  flex:1;background:#111;border:1.5px solid #2a2d38;
+  border-radius:7px;padding:6px 10px;font-size:11px;
+  color:#888;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+#br-close{font-size:18px;cursor:pointer;padding:4px 8px;color:#888}
+#br-frame{
+  flex:1;border:none;background:#fff;
+  width:100%;display:block;
+}
+#br-loading{
+  position:absolute;top:50px;left:0;right:0;
+  height:3px;background:#1a73e8;
+  transform:scaleX(0);transform-origin:left;
+  transition:transform 1.5s ease;
+}
+#br-loading.on{transform:scaleX(.9)}
+#br-loading.done{transform:scaleX(1);transition:transform .2s}
+
+/* ═══ DRAWER ═══ */
+#overlay{
+  position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.6);
+  opacity:0;pointer-events:none;transition:opacity .22s;
+}
+#overlay.on{opacity:1;pointer-events:all}
+#drawer{
+  position:fixed;top:0;left:0;bottom:0;
+  width:72%;max-width:260px;
+  background:#1a1d26;z-index:151;
+  transform:translateX(-100%);transition:transform .25s;
+  display:flex;flex-direction:column;
+}
+#drawer.on{transform:translateX(0)}
+.drw-head{
+  background:#e8342a;padding:28px 16px 16px;
+  font-size:22px;font-weight:900;
+}
+.drw-head small{display:block;font-size:10px;opacity:.7;font-weight:400;margin-top:2px}
+.drw-body{flex:1;overflow-y:auto;padding:8px 0}
+.di{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 16px;font-size:14px;font-weight:500;cursor:pointer;
+  border-left:3px solid transparent;color:#ddd;
+}
+.di:active{background:#252830}
+.di.on{border-left-color:#e8342a;color:#e8342a;background:#1f2230}
+.di-ico{font-size:18px;width:22px;text-align:center}
+.drw-div{height:1px;background:#252830;margin:6px 16px}
+.drw-foot{padding:14px 16px;border-top:1px solid #252830}
+.drw-usr{font-size:11px;color:#555;margin-bottom:10px}
+#btn-lout{
+  width:100%;padding:10px;background:transparent;
+  border:1.5px solid #333;color:#666;border-radius:8px;
+  font-size:12px;font-weight:600;cursor:pointer;
+}
+#btn-lout:active{border-color:#e53935;color:#e53935}
+
+/* ═══ LOGIN MODAL (optional) ═══ */
+#loginmodal{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,.85);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;
+}
+#loginmodal.on{opacity:1;pointer-events:all}
+.lm-box{
+  width:100%;max-width:340px;background:#1a1d26;
+  border-radius:14px;padding:22px 18px;border:1px solid #252830;
+}
+.lm-box h2{font-size:17px;font-weight:700;margin-bottom:16px;color:#fff}
+.fld{margin-bottom:11px}
+.fld label{display:block;font-size:9px;font-weight:700;
+  color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.fld input{
+  width:100%;background:#111;border:1.5px solid #252830;
+  border-radius:8px;padding:11px 12px;font-size:14px;color:#fff;
+  outline:none;-webkit-appearance:none;
+}
+.fld input:focus{border-color:#1a73e8}
+.fld input::placeholder{color:#333}
+.lm-btn{
+  width:100%;padding:12px;background:#e8342a;
+  color:#fff;border:none;border-radius:8px;
+  font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;
+}
+.lm-sub{text-align:center;margin-top:10px;font-size:11px;color:#555}
+.lm-sub a{color:#1a73e8;text-decoration:none;font-weight:600}
+.lm-close{float:right;font-size:18px;cursor:pointer;color:#555;margin-top:-4px}
+#l-err{color:#ff6b6b;font-size:11px;min-height:14px;text-align:center;margin-top:6px}
+#lp-reg{display:none}
 </style>
 </head>
 <body>
 
-<!-- ══ INTERNAL WEBVIEW OVERLAY ══ -->
-<div id="webview-overlay">
-  <div id="wv-top">
-    <button class="wv-btn" onclick="closeWV()" title="Volver">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>
-    </button>
-    <div id="wv-title">Cargando…</div>
-    <div id="wv-controls">
-      <button class="wv-btn" onclick="wvBack()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15,18 9,12 15,6"/></svg>
-      </button>
-      <button class="wv-btn" onclick="wvFwd()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9,18 15,12 9,6"/></svg>
-      </button>
-      <button class="wv-btn" onclick="wvRefresh()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-      </button>
-    </div>
-  </div>
-  <div id="wv-loading"></div>
-  <iframe id="wv-frame" src="about:blank"
-    onload="document.getElementById('wv-loading').classList.add('done')"
-    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation">
-  </iframe>
-</div>
-
-<!-- ══ DRAWER ══ -->
-<div id="drw-ov" onclick="closeDrw()"></div>
-<div id="drw">
-  <div class="dh">
-    <div class="dh-title">Al<span style="opacity:.65">Día</span></div>
-    <div class="dh-sub">Medios argentinos</div>
-  </div>
-  <div class="drw-body">
-    <div class="di on"  onclick="goTab(0);closeDrw()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Diarios
-    </div>
-    <div class="di" onclick="goTab(1);closeDrw()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg>Noticias
-    </div>
-    <div class="di" onclick="goTab(2);closeDrw()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>Radios
-    </div>
-    <div class="di" onclick="goTab(3);closeDrw()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Notas
-    </div>
-    <div class="di" onclick="goTab(4);closeDrw()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar
-    </div>
-    <div class="ddiv"></div>
-    <div class="di" id="drw-login" onclick="openLogin()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span id="drw-login-txt">Iniciar sesion</span>
-    </div>
-  </div>
-  <div class="drw-foot">
-    <div class="duser" id="duser">Sin sesion</div>
-    <button class="drw-btn" id="btn-logout" onclick="doLogout()" style="display:none">Cerrar sesion</button>
-  </div>
-</div>
-
-<!-- ══ LOGIN MODAL ══ -->
-<div id="login-modal">
-  <div class="lbox">
-    <div id="lp-in">
-      <h2>Iniciar sesion</h2>
-      <div class="lfld"><label>Correo</label>
-        <input type="email" id="li-em" placeholder="usuario@mail.com"/></div>
-      <div class="lfld"><label>Contrasena</label>
-        <input type="password" id="li-pw" placeholder="••••••••"/></div>
-      <div class="l-btns">
-        <button class="lb-sk" onclick="closeLogin()">Cancelar</button>
-        <button class="lb-in" onclick="doLogin()">Entrar</button>
-      </div>
-      <div id="l-err"></div>
-      <div class="l-reg">No tenes cuenta? <a onclick="showReg()">Registrarse</a></div>
-    </div>
-    <div id="lp-reg" style="display:none">
-      <h2>Crear cuenta</h2>
-      <div class="lfld"><label>Correo</label>
-        <input type="email" id="reg-em" placeholder="usuario@mail.com"/></div>
-      <div class="lfld"><label>Contrasena</label>
-        <input type="password" id="reg-pw" placeholder="Min. 6 caracteres"/></div>
-      <div class="l-btns">
-        <button class="lb-sk" onclick="showLI()">Volver</button>
-        <button class="lb-in" onclick="doReg()">Crear</button>
-      </div>
-      <div id="l-err"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ SHELL ══ -->
+<!-- SHELL -->
 <div id="shell">
 
   <!-- TOP BAR -->
   <div id="topbar">
-    <div class="ti" onclick="openDrw()">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </div>
-    <div id="top-title">Al<em>Dia</em></div>
-    <div class="ti" onclick="openLogin()" style="margin-left:6px">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    </div>
+    <div id="btn-ham" onclick="openDrw()">&#9776;</div>
+    <div id="top-ttl">Al<em>Día</em></div>
+    <span class="t-ico" onclick="goTab('notas',4)" title="Notas">&#128221;</span>
+    <span class="t-ico" onclick="openLogin()" title="Cuenta">&#128100;</span>
   </div>
 
   <!-- BANNER -->
   <div id="banner">
-    <div class="bslide on" id="bs0">
-      <div class="bico w">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
-      </div>
-      <div style="flex:1;min-width:0"><div class="blbl">PRONOSTICO</div><div class="bval" id="bv0">Buenos Aires - cargando...</div></div>
-    </div>
-    <div class="bslide" id="bs1">
-      <div class="bico d">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      </div>
-      <div style="flex:1;min-width:0"><div class="blbl">DOLAR OFICIAL</div><div class="bval" id="bv1">Cargando...</div></div>
-    </div>
-    <div class="bslide" id="bs2">
-      <div class="bico b">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      </div>
-      <div style="flex:1;min-width:0"><div class="blbl">DOLAR BLUE</div><div class="bval" id="bv2">Cargando...</div></div>
-    </div>
-    <div class="bslide" id="bs3">
-      <div class="bico e">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M21.6 13H3m18.6-4H3M21 16c-1.5 2.5-4.2 4-7 4a9 9 0 1 1 0-18c2.8 0 5.5 1.5 7 4"/></svg>
-      </div>
-      <div style="flex:1;min-width:0"><div class="blbl">EURO</div><div class="bval" id="bv3">Cargando...</div></div>
-    </div>
-    <div class="bslide" id="bs4">
-      <div class="bico btc">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 4.26m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727"/></svg>
-      </div>
-      <div style="flex:1;min-width:0"><div class="blbl">BITCOIN</div><div class="bval" id="bv4">Cargando...</div></div>
-    </div>
     <div class="bdots" id="bdots"></div>
   </div>
 
   <!-- CONTENT -->
   <div id="content">
 
-    <!-- TAB 0: DIARIOS -->
-    <div class="tab on" id="tab0">
+    <!-- TAB DIARIOS -->
+    <div id="tab-diarios" class="tab on">
       <div class="sec">
-        <div class="sec-h">Recientes <span>(5)</span></div>
-        <div class="hscroll" id="row-rec"></div>
+        <div class="sec-h">&#128240; Recientes <small>(5)</small></div>
+        <div class="hrow" id="r-rec"></div>
       </div>
       <div class="sec">
-        <div class="sec-h">General <span>(8)</span></div>
-        <div class="hscroll" id="row-gen"></div>
+        <div class="sec-h">&#127760; General <small>(8)</small></div>
+        <div class="hrow" id="r-gen"></div>
       </div>
       <div class="sec">
-        <div class="sec-h">Economia y Politica <span>(5)</span></div>
-        <div class="hscroll" id="row-eco"></div>
+        <div class="sec-h">&#128200; Economía y Política <small>(5)</small></div>
+        <div class="hrow" id="r-eco"></div>
       </div>
       <div class="sec">
-        <div class="sec-h">Deportes</div>
-        <div class="hscroll" id="row-dep"></div>
+        <div class="sec-h">&#9917; Deportes</div>
+        <div class="hrow" id="r-dep"></div>
       </div>
       <div class="sec">
-        <div class="sec-h">Internacional</div>
-        <div class="hscroll" id="row-int"></div>
+        <div class="sec-h">&#127758; Internacional</div>
+        <div class="hrow" id="r-int"></div>
       </div>
     </div>
 
-    <!-- TAB 1: NOTICIAS -->
-    <div class="tab" id="tab1">
-      <button class="n-btn" onclick="loadNews(true)">
-        Actualizar noticias del dia
-      </button>
-      <div class="n-loading" id="news-msg">Toca "Actualizar" para cargar las noticias</div>
+    <!-- TAB NOTICIAS -->
+    <div id="tab-noticias" class="tab">
+      <div id="news-status" class="n-loading">
+        Tocá <strong>&#128293; Noticias</strong> para cargar las últimas noticias
+      </div>
       <div id="news-list"></div>
     </div>
 
-    <!-- TAB 2: RADIOS -->
-    <div class="tab" id="tab2">
-      <div class="srch">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="search" placeholder="Buscar emisora..." oninput="filterR(this.value)"/>
+    <!-- TAB RADIOS -->
+    <div id="tab-radios" class="tab">
+      <div class="srch-box">
+        <span style="color:#555">&#128269;</span>
+        <input type="search" id="rsrch" placeholder="Buscar emisora…" oninput="filterR(this.value)"/>
       </div>
       <div class="sec">
-        <div class="sec-h">Recientes</div>
-        <div class="rgrid" id="row-rrec"></div>
+        <div class="sec-h">&#9733; Recientes</div>
+        <div class="rgrid" id="r-rrec"></div>
       </div>
       <div class="sec">
-        <div class="sec-h">Nacionales</div>
-        <div class="rgrid" id="row-rall"></div>
+        <div class="sec-h">&#128251; Nacionales</div>
+        <div class="rgrid" id="r-rall"></div>
       </div>
     </div>
 
-    <!-- TAB 3: NOTAS -->
-    <div class="tab" id="tab3">
-      <div id="notepad-area">
-        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Bloc de Notas</div>
-        <textarea id="nota" placeholder="Escribi tus notas aqui...&#10;Se guardan automaticamente."></textarea>
-        <div class="note-btns">
-          <button class="note-btn note-clear" onclick="clearNota()">Borrar todo</button>
-          <button class="note-btn note-save" onclick="saveNota()">Guardar</button>
-        </div>
-        <div class="note-saved" id="note-ok"></div>
-      </div>
-    </div>
-
-    <!-- TAB 4: BUSCAR -->
-    <div class="tab" id="tab4">
-      <div class="srch">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="search" placeholder="Buscar diarios, radios..." oninput="globalS(this.value)"/>
+    <!-- TAB BUSCAR -->
+    <div id="tab-buscar" class="tab">
+      <div class="srch-box">
+        <span style="color:#555">&#128269;</span>
+        <input type="search" id="gsrch" placeholder="Buscar diarios, radios…" oninput="gSearch(this.value)"/>
       </div>
       <div id="gres"></div>
+    </div>
+
+    <!-- TAB NOTAS -->
+    <div id="tab-notas" class="tab">
+      <div class="note-toolbar">
+        <button class="note-btn" onclick="saveNote()">&#128190; Guardar</button>
+        <button class="note-btn" onclick="clearNote()">&#128465; Borrar todo</button>
+        <button class="note-btn" onclick="copyNote()">&#128203; Copiar</button>
+        <span id="note-msg" class="note-saved" style="display:none">&#10003; Guardado</span>
+      </div>
+      <textarea id="notepad-area" placeholder="Escribe tus notas aquí...&#10;Se guardan automáticamente."></textarea>
     </div>
 
   </div><!-- /content -->
 
   <!-- BOTTOM NAV -->
-  <div id="bottomnav">
-    <div id="navbarline" style="position:absolute;top:0;height:2px;background:var(--acc);width:20%;border-radius:0 0 3px 3px;left:0;transition:left .22s"></div>
-
-    <button class="nb on" onclick="goTab(0)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-      Diarios
+  <div id="botnav">
+    <div id="navind" style="left:0%"></div>
+    <button class="nb on"  onclick="goTab('diarios',0)">
+      <span class="ni">&#128240;</span>Diarios
     </button>
-    <button class="nb" onclick="goTab(1)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13,2 3,14 12,14 11,22 21,10 12,10 13,2"/></svg>
-      Noticias
+    <button class="nb"     onclick="goTab('noticias',1);loadNews()">
+      <span class="ni">&#128293;</span>Noticias
     </button>
-    <button class="nb" onclick="goTab(2)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4"/></svg>
-      Radios
+    <button class="nb"     onclick="goTab('radios',2)">
+      <span class="ni">&#128251;</span>Radios
     </button>
-    <button class="nb" onclick="goTab(3)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
-      Notas
+    <button class="nb"     onclick="goTab('buscar',3)">
+      <span class="ni">&#128269;</span>Buscar
     </button>
-    <button class="nb" onclick="goTab(4)">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      Buscar
+    <button class="nb"     onclick="goTab('notas',4)">
+      <span class="ni">&#128221;</span>Notas
     </button>
   </div>
 
 </div><!-- /shell -->
 
-<!-- FLOAT PLAYER -->
-<div id="fpl">
-  <div id="fpl-logo">R</div>
-  <div id="fpl-info">
-    <div class="fpbars" id="fpbars">
-      <div class="fpb"></div><div class="fpb"></div>
-      <div class="fpb"></div><div class="fpb"></div><div class="fpb"></div>
-    </div>
-    <div id="fpl-name">Radio</div>
-    <div id="fpl-sub">En vivo</div>
+<!-- INTERNAL BROWSER -->
+<div id="browser">
+  <div id="br-bar">
+    <span id="br-back" onclick="brBack()">&#8592;</span>
+    <span id="br-fwd"  onclick="brFwd()">&#8594;</span>
+    <span id="br-home" onclick="brHome()">&#127968;</span>
+    <div  id="br-url">Cargando...</div>
+    <span id="br-close" onclick="closeBr()">&#10005;</span>
   </div>
-  <button id="fpl-btn" onclick="togglePlay()">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" stroke="none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-  </button>
+  <div id="br-loading"></div>
+  <iframe id="br-frame" src="about:blank"
+    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"
+    onload="if(typeof brLoaded==='function')brLoaded()"
+    onerror="if(typeof brLoaded==='function')brLoaded()">
+  </iframe>
+</div>
+
+<!-- DRAWER -->
+<div id="overlay" onclick="closeDrw()"></div>
+<div id="drawer">
+  <div class="drw-head">Al<span style="opacity:.6">Día</span><small>Medios &amp; info argentina</small></div>
+  <div class="drw-body">
+    <div class="di on" onclick="goTab('diarios',0);closeDrw()"><span class="di-ico">&#128240;</span>Diarios</div>
+    <div class="di"    onclick="goTab('noticias',1);loadNews();closeDrw()"><span class="di-ico">&#128293;</span>Noticias del día</div>
+    <div class="di"    onclick="goTab('radios',2);closeDrw()"><span class="di-ico">&#128251;</span>Radios en vivo</div>
+    <div class="di"    onclick="goTab('buscar',3);closeDrw()"><span class="di-ico">&#128269;</span>Buscar</div>
+    <div class="di"    onclick="goTab('notas',4);closeDrw()"><span class="di-ico">&#128221;</span>Bloc de notas</div>
+    <div class="drw-div"></div>
+    <div class="di"    onclick="openLogin();closeDrw()"><span class="di-ico">&#128100;</span>Mi cuenta</div>
+  </div>
+  <div class="drw-foot">
+    <div class="drw-usr" id="drw-usr">Sin sesión iniciada</div>
+    <button id="btn-lout" onclick="doLogout()">Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- LOGIN MODAL (OPTIONAL) -->
+<div id="loginmodal" onclick="closeLoginOutside(event)">
+  <div class="lm-box">
+    <div id="lp-login">
+      <h2>Mi cuenta <span class="lm-close" onclick="closeLogin()">&#10005;</span></h2>
+      <div class="fld"><label>Correo</label>
+        <input type="email" id="li-em" placeholder="usuario@mail.com" autocomplete="email"/></div>
+      <div class="fld"><label>Contraseña</label>
+        <input type="password" id="li-pw" placeholder="••••••••"/></div>
+      <button class="lm-btn" onclick="doLogin()">Iniciar sesión</button>
+      <div id="l-err"></div>
+      <div class="lm-sub">¿No tenés cuenta? <a onclick="showReg()">Registrarse</a></div>
+    </div>
+    <div id="lp-reg">
+      <h2>Crear cuenta <span class="lm-close" onclick="closeLogin()">&#10005;</span></h2>
+      <div class="fld"><label>Correo</label>
+        <input type="email" id="reg-em" placeholder="usuario@mail.com" autocomplete="email"/></div>
+      <div class="fld"><label>Contraseña</label>
+        <input type="password" id="reg-pw" placeholder="Mínimo 6 caracteres"/></div>
+      <button class="lm-btn" onclick="doReg()">Crear cuenta</button>
+      <div id="l-err"></div>
+      <div class="lm-sub">¿Ya tenés cuenta? <a onclick="showLogin()">Iniciar sesión</a></div>
+    </div>
+  </div>
 </div>
 
 <audio id="aud" preload="none"></audio>
 
 <script>
-/* ══════════════════════
-   FIREBASE CONFIG
-   Pega tus credenciales:
-══════════════════════ */
-var FB={apiKey:"",authDomain:"",projectId:"",storageBucket:"",messagingSenderId:"",appId:""};
+/* ════════════════════════════════════════
+   FIREBASE CONFIG (opcional)
+   Pegá tus credenciales si querés login real
+════════════════════════════════════════ */
+var FB={apiKey:'',authDomain:'',projectId:'',storageBucket:'',messagingSenderId:'',appId:''};
 
-/* ══ AUTH ══ */
-var loggedIn=false, userEmail='';
-function tryFB(){
-  try{
-    if(typeof firebase!=='undefined'&&FB.apiKey){
-      firebase.initializeApp(FB);
-      firebase.auth().onAuthStateChanged(function(u){
-        if(u){setUser(u.email);}
-      });
-      window._auth=firebase.auth();
-      return true;
-    }
-  }catch(e){}
-  return false;
-}
-var hasFB=false;
+/* ════ INIT ════ */
+window.onload=function(){
+  buildBanner();
+  buildDiarios();
+  buildRadios();
+  loadNote();
+  loadFinancial();
+  var u=localStorage.getItem('aldiaUser');
+  if(u) setUser(u);
+};
 
-function setUser(em){
-  loggedIn=true;userEmail=em;
-  localStorage.setItem('aldiaUser',em);
-  document.getElementById('duser').textContent='Usuario: '+em;
-  document.getElementById('drw-login-txt').textContent='Mi cuenta';
-  document.getElementById('btn-logout').style.display='block';
-}
-
-function doLogout(){
-  loggedIn=false;userEmail='';
-  localStorage.removeItem('aldiaUser');
-  if(hasFB&&window._auth) window._auth.signOut();
-  document.getElementById('duser').textContent='Sin sesion';
-  document.getElementById('drw-login-txt').textContent='Iniciar sesion';
-  document.getElementById('btn-logout').style.display='none';
-  stopRadio();
+/* ════ TABS ════ */
+var curTab='diarios';
+function goTab(t,i){
+  document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on');});
+  var el=document.getElementById('tab-'+t);
+  if(el) el.classList.add('on');
+  document.querySelectorAll('.nb').forEach(function(x){x.classList.remove('on');});
+  document.querySelectorAll('.nb')[i].classList.add('on');
+  document.getElementById('navind').style.left=(i*20)+'%';
+  document.querySelectorAll('.di').forEach(function(x){x.classList.remove('on');});
+  var di=document.querySelector('.di[onclick*="\''+t+'\'"]');
+  if(di) di.classList.add('on');
+  var titles={diarios:'Al<em>Día</em>',noticias:'Noticias',radios:'Radios',buscar:'Buscar',notas:'Bloc de Notas'};
+  document.getElementById('top-ttl').innerHTML=titles[t]||'Al<em>Día</em>';
+  curTab=t;
+  // scroll content to top
+  document.getElementById('content').scrollTop=0;
 }
 
-function doLogin(){
-  var em=gv('li-em'),pw=gv('li-pw');
-  if(!em||!pw){setErr('Completa todos los campos.');return;}
-  if(hasFB&&window._auth){
-    window._auth.signInWithEmailAndPassword(em,pw)
-      .then(function(r){setUser(r.user.email);closeLogin();})
-      .catch(function(e){setErr(fberr(e.code));});
-  } else {
-    if(pw.length<4){setErr('Contrasena muy corta.');return;}
-    setUser(em);closeLogin();
-  }
-}
-function doReg(){
-  var em=gv('reg-em'),pw=gv('reg-pw');
-  if(!em||!pw){setErr('Completa todos los campos.');return;}
-  if(pw.length<6){setErr('Min. 6 caracteres.');return;}
-  if(hasFB&&window._auth){
-    window._auth.createUserWithEmailAndPassword(em,pw)
-      .then(function(r){setUser(r.user.email);closeLogin();})
-      .catch(function(e){setErr(fberr(e.code));});
-  } else {setUser(em);closeLogin();}
-}
-
-function openLogin(){
-  closeDrw();
-  document.getElementById('login-modal').classList.add('open');
-}
-function closeLogin(){document.getElementById('login-modal').classList.remove('open');}
-function showReg(){document.getElementById('lp-in').style.display='none';document.getElementById('lp-reg').style.display='';}
-function showLI(){document.getElementById('lp-reg').style.display='none';document.getElementById('lp-in').style.display='';}
-function gv(id){return document.getElementById(id).value.trim();}
-function setErr(t){document.getElementById('l-err').textContent=t;}
-function fberr(c){
-  return({'auth/user-not-found':'Correo no registrado.','auth/wrong-password':'Contrasena incorrecta.',
-    'auth/email-already-in-use':'Ese correo ya esta en uso.','auth/invalid-email':'Correo no valido.',
-    'auth/too-many-requests':'Demasiados intentos.'}[c]||'Error: '+c);
-}
-
-/* ══ DRAWER ══ */
+/* ════ DRAWER ════ */
 function openDrw(){
-  document.getElementById('drw').classList.add('on');
-  document.getElementById('drw-ov').classList.add('on');
+  document.getElementById('drawer').classList.add('on');
+  document.getElementById('overlay').classList.add('on');
 }
 function closeDrw(){
-  document.getElementById('drw').classList.remove('on');
-  document.getElementById('drw-ov').classList.remove('on');
+  document.getElementById('drawer').classList.remove('on');
+  document.getElementById('overlay').classList.remove('on');
 }
 
-/* ══ TABS ══ */
-var TABS=['Diarios','Noticias','Radios','Notas','Buscar'];
-var curTab=0;
-function goTab(i){
-  document.querySelectorAll('.tab').forEach(function(t,ti){
-    t.classList.toggle('on',ti===i);
-  });
-  document.querySelectorAll('.nb').forEach(function(b,bi){b.classList.toggle('on',bi===i);});
-  document.getElementById('navbarline').style.left=(i*20)+'%';
-  document.querySelectorAll('.di').forEach(function(d,di){d.classList.toggle('on',di===i);});
-  var titles={0:'Al<em>Dia</em>',1:'Noticias',2:'Radios',3:'Mis Notas',4:'Buscar'};
-  document.getElementById('top-title').innerHTML=titles[i]||'Al<em>Dia</em>';
-  curTab=i;
-  document.getElementById('content').scrollTop=0;
-  if(i===1&&!newsLoaded) loadNews(false);
-  if(i===3) loadNota();
-}
+/* ════ LOGIN ════ */
+function openLogin(){document.getElementById('loginmodal').classList.add('on');}
+function closeLogin(){document.getElementById('loginmodal').classList.remove('on');}
+function closeLoginOutside(e){if(e.target===document.getElementById('loginmodal'))closeLogin();}
+function showReg(){document.getElementById('lp-login').style.display='none';document.getElementById('lp-reg').style.display='';document.getElementById('l-err').textContent='';}
+function showLogin(){document.getElementById('lp-reg').style.display='none';document.getElementById('lp-login').style.display='';document.getElementById('l-err').textContent='';}
 
-/* ══ INTERNAL WEBVIEW ══ */
-function openWV(url,title){
-  var ov=document.getElementById('webview-overlay');
-  var fr=document.getElementById('wv-frame');
-  var ld=document.getElementById('wv-loading');
-  document.getElementById('wv-title').textContent=title||'Cargando...';
-  ld.classList.remove('done');
+function doLogin(){
+  var em=g('li-em'),pw=g('li-pw');
+  if(!em||!pw){setErr('Completá los campos.');return;}
+  if(pw.length<4){setErr('Contraseña muy corta.');return;}
+  setUser(em);closeLogin();
+}
+function doReg(){
+  var em=g('reg-em'),pw=g('reg-pw');
+  if(!em||!pw){setErr('Completá los campos.');return;}
+  if(pw.length<6){setErr('Mínimo 6 caracteres.');return;}
+  setUser(em);closeLogin();
+}
+function doLogout(){
+  localStorage.removeItem('aldiaUser');
+  document.getElementById('drw-usr').textContent='Sin sesión iniciada';
+}
+function setUser(em){
+  localStorage.setItem('aldiaUser',em);
+  document.getElementById('drw-usr').textContent='&#128100; '+em;
+}
+function setErr(t){document.getElementById('l-err').textContent=t;}
+function g(id){return document.getElementById(id).value.trim();}
+
+/* ════ INTERNAL BROWSER ════ */
+var brHistory=[], brHPos=-1;
+function openBr(url){
+  var fr=document.getElementById('br-frame');
+  var br=document.getElementById('browser');
+  document.getElementById('br-url').textContent=url;
+  document.getElementById('br-loading').className='on';
   fr.src=url;
-  ov.classList.add('open');
+  brHistory=brHistory.slice(0,brHPos+1);
+  brHistory.push(url);brHPos=brHistory.length-1;
+  br.classList.add('on');
 }
-function closeWV(){
-  var ov=document.getElementById('webview-overlay');
-  var fr=document.getElementById('wv-frame');
-  ov.classList.remove('open');
-  setTimeout(function(){fr.src='about:blank';},300);
+function closeBr(){
+  document.getElementById('browser').classList.remove('on');
+  document.getElementById('br-frame').src='about:blank';
 }
-function wvBack(){try{document.getElementById('wv-frame').contentWindow.history.back();}catch(e){}}
-function wvFwd(){try{document.getElementById('wv-frame').contentWindow.history.forward();}catch(e){}}
-function wvRefresh(){
-  var fr=document.getElementById('wv-frame');
-  var src=fr.src;fr.src='about:blank';
-  setTimeout(function(){fr.src=src;},100);
-  document.getElementById('wv-loading').classList.remove('done');
+function brBack(){
+  if(brHPos>0){brHPos--;var u=brHistory[brHPos];
+    document.getElementById('br-frame').src=u;
+    document.getElementById('br-url').textContent=u;}
+}
+function brFwd(){
+  if(brHPos<brHistory.length-1){brHPos++;var u=brHistory[brHPos];
+    document.getElementById('br-frame').src=u;
+    document.getElementById('br-url').textContent=u;}
+}
+function brHome(){closeBr();}
+function brLoaded(){
+  var l=document.getElementById('br-loading');
+  l.className='done';
+  setTimeout(function(){l.className='';},400);
 }
 
-/* ══ BANNER ══ */
-var banN=5,banI=0,banT=null;
-function initBanner(){
+/* ════ BANNER ════ */
+var SLIDES=[
+  {ico:'&#9925;',cls:'bw',lbl:'PRONÓSTICO',val:'GBA — cargando...',id:'s0'},
+  {ico:'&#128181;',cls:'bd',lbl:'DÓLAR OFICIAL',val:'Cargando...',id:'s1'},
+  {ico:'&#128200;',cls:'bbl',lbl:'DÓLAR BLUE',val:'Cargando...',id:'s2'},
+  {ico:'&#128176;',cls:'be',lbl:'EURO',val:'Cargando...',id:'s3'},
+  {ico:'&#8383;', cls:'bb',lbl:'BITCOIN',val:'Cargando...',id:'s4'},
+];
+var bIdx=0,bTimer;
+function buildBanner(){
+  var ban=document.getElementById('banner');
   var dots=document.getElementById('bdots');
-  for(var i=0;i<banN;i++){
+  SLIDES.forEach(function(s,i){
     var d=document.createElement('div');
-    d.className='dot'+(i===0?' on':'');
-    (function(idx){d.onclick=function(){goBan(idx);};})(i);
-    dots.appendChild(d);
-  }
-  banT=setInterval(function(){goBan((banI+1)%banN);},4500);
+    d.className='bslide'+(i>0?' off':'');
+    d.id=s.id;
+    d.innerHTML='<div class="b-ico '+s.cls+'">'+s.ico+'</div>'
+      +'<div class="b-txt"><div class="b-lbl">'+s.lbl+'</div>'
+      +'<div class="b-val" id="'+s.id+'v">'+s.val+'</div></div>';
+    ban.insertBefore(d,dots);
+    var dot=document.createElement('div');
+    dot.className='bdot'+(i===0?' on':'');
+    (function(idx){dot.onclick=function(){goBan(idx);};})(i);
+    dots.appendChild(dot);
+  });
+  bTimer=setInterval(function(){goBan((bIdx+1)%SLIDES.length);},4200);
 }
 function goBan(i){
-  document.getElementById('bs'+banI).classList.remove('on');
-  document.querySelectorAll('.dot')[banI].classList.remove('on');
-  banI=i;
-  document.getElementById('bs'+i).classList.add('on');
-  document.querySelectorAll('.dot')[i].classList.add('on');
+  var prev=document.getElementById(SLIDES[bIdx].id);
+  if(prev)prev.classList.add('off');
+  document.querySelectorAll('.bdot')[bIdx].classList.remove('on');
+  bIdx=i;
+  var next=document.getElementById(SLIDES[i].id);
+  if(next)next.classList.remove('off');
+  document.querySelectorAll('.bdot')[i].classList.add('on');
 }
-function setBan(i,t){var el=document.getElementById('bv'+i);if(el)el.textContent=t;}
+function setBv(id,txt){var el=document.getElementById(id+'v');if(el)el.textContent=txt;}
 
-/* ══ FINANCIAL DATA ══ */
-function xget(url,cb){
-  var x=new XMLHttpRequest();
-  x.open('GET',url,true);x.timeout=8000;
-  x.onreadystatechange=function(){
-    if(x.readyState===4&&x.status===200){
-      try{cb(JSON.parse(x.responseText));}catch(e){}
-    }
-  };
-  try{x.send();}catch(e){}
-}
-
+/* ════ FINANCIAL DATA ════ */
 function loadFinancial(){
   xget('https://dolarapi.com/v1/dolares/oficial',function(d){
-    setBan(1,'COMPRA $'+d.compra.toFixed(1)+'   VENTA $'+d.venta.toFixed(1));
-  });
+    if(d&&d.compra)setBv('s1','COMPRA $'+d.compra.toFixed(1)+'   VENTA $'+d.venta.toFixed(1));});
   xget('https://dolarapi.com/v1/dolares/blue',function(d){
-    setBan(2,'COMPRA $'+d.compra.toFixed(1)+'   VENTA $'+d.venta.toFixed(1));
-  });
+    if(d&&d.compra)setBv('s2','COMPRA $'+d.compra.toFixed(1)+'   VENTA $'+d.venta.toFixed(1));});
   xget('https://dolarapi.com/v1/dolares/euro',function(d){
-    setBan(3,'COMPRA $'+d.compra.toFixed(1)+'   VENTA $'+d.venta.toFixed(1));
-  });
+    if(d&&d.compra)setBv('s3','COMPRA $'+d.compra.toFixed(1)+'   VENTA $'+d.venta.toFixed(1));});
   xget('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd',function(d){
-    if(d.bitcoin) setBan(4,'USD $'+Number(d.bitcoin.usd).toLocaleString('es-AR'));
-  });
+    if(d&&d.bitcoin)setBv('s4','USD $'+Math.round(d.bitcoin.usd).toLocaleString('es-AR'));});
   xget('https://api.open-meteo.com/v1/forecast?latitude=-34.36&longitude=-58.73&daily=temperature_2m_max,temperature_2m_min&current_weather=true&timezone=America%2FArgentina%2FBuenos_Aires&forecast_days=1',function(d){
-    if(d.daily){
+    if(d&&d.daily){
       var mn=d.daily.temperature_2m_min[0].toFixed(1);
       var mx=d.daily.temperature_2m_max[0].toFixed(1);
-      setBan(0,'GBA - MIN '+mn+'C   MAX '+mx+'C');
+      var w=d.current_weather.weathercode;
+      var ico=w===0?'&#9728;':w<=3?'&#9925;':w<=67?'&#127783;':'&#10052;';
+      document.querySelector('#s0 .b-ico').innerHTML=ico;
+      setBv('s0','GBA — MÍN '+mn+'°C  MÁX '+mx+'°C');
     }
   });
 }
+setInterval(loadFinancial,5*60*1000);
 
-/* ══ DIARIOS ══ */
-var DIARIOS={
+function xget(url,cb){
+  try{
+    var x=new XMLHttpRequest();
+    x.open('GET',url,true);x.timeout=9000;
+    x.onreadystatechange=function(){
+      if(x.readyState===4&&x.status===200){try{cb(JSON.parse(x.responseText));}catch(e){}}
+    };
+    x.send();
+  }catch(e){}
+}
+
+/* ════ DIARIOS DATA ════ */
+var DD={
   rec:[
-    {n:'Infobae',  u:'https://www.infobae.com',          bg:'#ff9900',fg:'#fff',tx:'inf'},
-    {n:'Pagina/12',u:'https://www.pagina12.com.ar',      bg:'#ffffff',fg:'#111',tx:'P|12'},
-    {n:'Ambito',   u:'https://www.ambito.com',           bg:'#ffffff',fg:'#cc0000',tx:'ambito'},
-    {n:'El Econ.', u:'https://www.eleconomista.com.ar',  bg:'#0a0a0a',fg:'#88aadd',tx:'El\nEcon.'},
-    {n:'Cronista', u:'https://www.cronista.com',         bg:'#ffffff',fg:'#333',tx:'CRONISTA'},
+    {n:'Infobae',   u:'https://www.infobae.com',           bg:'#f90',    fg:'#fff', tx:'inf'},
+    {n:'Página/12', u:'https://www.pagina12.com.ar',       bg:'#fff',    fg:'#111', tx:'P|12'},
+    {n:'Ámbito',    u:'https://www.ambito.com',            bg:'#fff',    fg:'#c00', tx:'ámbito'},
+    {n:'El Econ.',  u:'https://www.eleconomista.com.ar',   bg:'#0a0a0a', fg:'#8cf', tx:'El\nEcon.'},
+    {n:'Cronista',  u:'https://www.cronista.com',          bg:'#fff',    fg:'#333', tx:'CRONISTA'},
   ],
   gen:[
-    {n:'Infobae',  u:'https://www.infobae.com',          bg:'#ff9900',fg:'#fff',tx:'inf'},
-    {n:'La Nacion',u:'https://www.lanacion.com.ar',      bg:'#ffffff',fg:'#005ab5',tx:'LN'},
-    {n:'Clarin',   u:'https://www.clarin.com',           bg:'#ffffff',fg:'#cc0000',tx:'Clarin'},
-    {n:'Pagina/12',u:'https://www.pagina12.com.ar',      bg:'#ffffff',fg:'#111',tx:'P|12'},
-    {n:'Perfil',   u:'https://www.perfil.com',           bg:'#ffffff',fg:'#333',tx:'Perfil'},
-    {n:'Cronica',  u:'https://www.cronica.com.ar',       bg:'#cc0000',fg:'#ffff00',tx:'Cronica'},
-    {n:'El Destape',u:'https://www.eldestapeweb.com',    bg:'#1a73e8',fg:'#fff',tx:'ElD'},
-    {n:'Minuto Uno',u:'https://www.minutouno.com',       bg:'#111',   fg:'#ff9900',tx:'M1'},
+    {n:'Infobae',   u:'https://www.infobae.com',           bg:'#f90',    fg:'#fff', tx:'inf'},
+    {n:'La Nación', u:'https://www.lanacion.com.ar',       bg:'#fff',    fg:'#005ab5',tx:'LN'},
+    {n:'Clarín',    u:'https://www.clarin.com',            bg:'#fff',    fg:'#c00', tx:'Clarín'},
+    {n:'Página/12', u:'https://www.pagina12.com.ar',       bg:'#fff',    fg:'#111', tx:'P|12'},
+    {n:'Perfil',    u:'https://www.perfil.com',            bg:'#fff',    fg:'#333', tx:'Perfil'},
+    {n:'Crónica',   u:'https://www.cronica.com.ar',        bg:'#c00',    fg:'#ff0', tx:'Crónica'},
+    {n:'El Destape',u:'https://www.eldestapeweb.com',      bg:'#1a73e8', fg:'#fff', tx:'ElD'},
+    {n:'Minuto 1',  u:'https://www.minutouno.com',         bg:'#111',    fg:'#f90', tx:'M1'},
   ],
   eco:[
-    {n:'Ambito',   u:'https://www.ambito.com',           bg:'#ffffff',fg:'#cc0000',tx:'ambito'},
-    {n:'Cronista', u:'https://www.cronista.com',         bg:'#ffffff',fg:'#333',tx:'CRONISTA'},
-    {n:'La Politica',u:'https://www.lapoliticaonline.com',bg:'#fff',  fg:'#005ab5',tx:'LaPolit.'},
-    {n:'El Econ.', u:'https://www.eleconomista.com.ar',  bg:'#0a0a0a',fg:'#88aadd',tx:'El\nEcon.'},
-    {n:'iProfesional',u:'https://www.iprofesional.com', bg:'#cc0000',fg:'#fff',tx:'iP'},
+    {n:'Ámbito',    u:'https://www.ambito.com',            bg:'#fff',    fg:'#c00', tx:'ámbito'},
+    {n:'Cronista',  u:'https://www.cronista.com',          bg:'#fff',    fg:'#333', tx:'CRONISTA'},
+    {n:'La Política',u:'https://www.lapoliticaonline.com', bg:'#fff',   fg:'#005ab5',tx:'LP\nOnline'},
+    {n:'El Econ.',  u:'https://www.eleconomista.com.ar',   bg:'#0a0a0a', fg:'#8cf', tx:'El\nEcon.'},
+    {n:'iProfesional',u:'https://www.iprofesional.com',   bg:'#c00',    fg:'#fff', tx:'iP'},
   ],
   dep:[
-    {n:'Ole',      u:'https://www.ole.com.ar',           bg:'#ffffff',fg:'#1a7a3a',tx:'Ole'},
-    {n:'TyC Sports',u:'https://www.tycsports.com',       bg:'#cc0000',fg:'#fff',tx:'TyC'},
-    {n:'ESPN AR',  u:'https://www.espn.com.ar',          bg:'#cc0000',fg:'#fff',tx:'ESPN'},
-    {n:'Infobae D.',u:'https://www.infobae.com/deportes',bg:'#ff9900',fg:'#fff',tx:'inf D.'},
+    {n:'Olé',       u:'https://www.ole.com.ar',            bg:'#fff',    fg:'#1a7a3a',tx:'Olé'},
+    {n:'TyC Sports',u:'https://www.tycsports.com',         bg:'#c00',    fg:'#fff', tx:'TyC'},
+    {n:'ESPN AR',   u:'https://www.espn.com.ar',           bg:'#c00',    fg:'#fff', tx:'ESPN'},
+    {n:'Infobae D.',u:'https://www.infobae.com/deportes',  bg:'#f90',    fg:'#fff', tx:'inf\n&#9917;'},
   ],
   int:[
-    {n:'BBC Mundo', u:'https://www.bbc.com/mundo',       bg:'#bb1919',fg:'#fff',tx:'BBC'},
-    {n:'NY Times',  u:'https://www.nytimes.com',         bg:'#ffffff',fg:'#111',tx:'NYT'},
-    {n:'Reuters',   u:'https://www.reuters.com',         bg:'#ff9900',fg:'#fff',tx:'Reuters'},
-    {n:'El Pais',   u:'https://www.elpais.com',          bg:'#005ab5',fg:'#fff',tx:'El Pais'},
+    {n:'BBC Mundo', u:'https://www.bbc.com/mundo',         bg:'#bb1919', fg:'#fff', tx:'BBC'},
+    {n:'NY Times',  u:'https://www.nytimes.com',           bg:'#fff',    fg:'#111', tx:'NYT'},
+    {n:'Reuters',   u:'https://www.reuters.com',           bg:'#f90',    fg:'#fff', tx:'Reuters'},
+    {n:'El País',   u:'https://www.elpais.com',            bg:'#005ab5', fg:'#fff', tx:'El País'},
   ]
 };
 
-function mkDCard(d){
+function mkD(d){
   var el=document.createElement('div');
-  el.className='nc';
-  var fs=d.tx.length>6?'8px':d.tx.length>4?'10px':'13px';
-  el.innerHTML='<div class="nc-img" style="background:'+d.bg+';color:'+d.fg
-    +';font-size:'+fs+'">'+d.tx.replace(/\n/g,'<br>')+'</div>'
-    +'<div class="nc-nm">'+d.n+'</div>';
-  el.onclick=function(){openWV(d.u,d.n);};
+  el.className='dcard';
+  var fs=d.tx.replace(/\n/g,'').length>7?'8px':d.tx.replace(/\n/g,'').length>4?'10px':'12px';
+  el.innerHTML='<div class="dcard-img" style="background:'+d.bg+';color:'+d.fg+';font-size:'+fs+'">'
+    +d.tx.replace(/\n/g,'<br>')+'</div>'
+    +'<div class="dcard-nm">'+d.n+'</div>';
+  el.onclick=function(){openBr(d.u);};
   return el;
 }
-
 function buildDiarios(){
-  var map={rec:'row-rec',gen:'row-gen',eco:'row-eco',dep:'row-dep',int:'row-int'};
+  var map={rec:'r-rec',gen:'r-gen',eco:'r-eco',dep:'r-dep',int:'r-int'};
   Object.keys(map).forEach(function(k){
     var el=document.getElementById(map[k]);
-    if(el) DIARIOS[k].forEach(function(d){el.appendChild(mkDCard(d));});
+    if(el) DD[k].forEach(function(d){el.appendChild(mkD(d));});
   });
 }
 
-/* ══ RADIOS ══ */
+/* ════ RADIOS ════ */
 var RADIOS=[
-  {id:'r10',    n:'Radio 10',   sub:'AM 710',   bg:'#fff',   fg:'#cc0000',tx:'R10))',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO10AM.mp3'},
-  {id:'mitre',  n:'Radio Mitre',sub:'AM 790',   bg:'#1d3557',fg:'#fff',   tx:'MITRE',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOMITRE.mp3'},
-  {id:'city',   n:'Radio City', sub:'FM 107.1', bg:'#111',   fg:'#ffff00',tx:'CITY', s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOCITY.mp3'},
-  {id:'lared',  n:'La Red',     sub:'AM 910',   bg:'#fff',   fg:'#005ab5',tx:'la red',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/LARED.mp3'},
-  {id:'convos', n:'Con Vos',    sub:'FM 89.9',  bg:'#1a5276',fg:'#fff',  tx:'CON VOS',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/CONVOSFM.mp3'},
-  {id:'cadena3',n:'Cadena 3',   sub:'Argentina',bg:'#1565c0',fg:'#fff',  tx:'C3))',  s:'https://playerservices.streamtheworld.com/api/livestream-redirect/CADENA3AAC.aac'},
-  {id:'aspen',  n:'Aspen 102.3',sub:'FM 102.3', bg:'#111',   fg:'#fff',  tx:'ASPEN', s:'https://playerservices.streamtheworld.com/api/livestream-redirect/FMASPEN.mp3'},
-  {id:'rockpop',n:'Rock & Pop', sub:'FM 95.9',  bg:'#222',   fg:'#f4c430',tx:'R&P',  s:'https://playerservices.streamtheworld.com/api/livestream-redirect/ROCKPOP.mp3'},
-  {id:'los40',  n:'Los 40',     sub:'FM 105.5', bg:'#ff8c00',fg:'#fff',  tx:'40s',   s:'https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40.mp3'},
-  {id:'rivad',  n:'Rivadavia',  sub:'AM 630',   bg:'#fff',   fg:'#333',  tx:'Rivad.',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_RIVADAVIA.mp3'},
-  {id:'la100',  n:'La 100',     sub:'FM 99.9',  bg:'#cc0000',fg:'#fff',  tx:'100',   s:'https://playerservices.streamtheworld.com/api/livestream-redirect/LA100.mp3'},
-  {id:'america',n:'Rdo. America',sub:'AM 1190', bg:'#fff',   fg:'#111',  tx:'RAMER.',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOAMERICA.mp3'},
+  {id:'r10',    n:'Radio 10',    sub:'AM 710',   bg:'#fff',    fg:'#c00',    tx:'R10))',  s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO10AM.mp3'},
+  {id:'mitre',  n:'Radio Mitre', sub:'AM 790',   bg:'#1d3557', fg:'#fff',    tx:'MITRE', s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOMITRE.mp3'},
+  {id:'city',   n:'Radio City',  sub:'FM 107.1', bg:'#111',    fg:'#ff0',    tx:'CITY',  s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOCITY.mp3'},
+  {id:'lared',  n:'La Red',      sub:'AM 910',   bg:'#fff',    fg:'#005ab5', tx:'la\nred',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/LARED.mp3'},
+  {id:'convos', n:'Con Vos',     sub:'FM 89.9',  bg:'#1a5276', fg:'#fff',    tx:'CON\nVOS',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/CONVOSFM.mp3'},
+  {id:'cadena3',n:'Cadena 3',    sub:'Argentina',bg:'#1565c0', fg:'#fff',    tx:'C3))',  s:'https://playerservices.streamtheworld.com/api/livestream-redirect/CADENA3AAC.aac'},
+  {id:'aspen',  n:'Aspen 102.3', sub:'FM 102.3', bg:'#111',    fg:'#fff',    tx:'ASPEN', s:'https://playerservices.streamtheworld.com/api/livestream-redirect/FMASPEN.mp3'},
+  {id:'rockpop',n:'Rock & Pop',  sub:'FM 95.9',  bg:'#222',    fg:'#f4c430', tx:'R&P',   s:'https://playerservices.streamtheworld.com/api/livestream-redirect/ROCKPOP.mp3'},
+  {id:'los40',  n:'Los 40',      sub:'FM 105.5', bg:'#ff8c00', fg:'#fff',    tx:'40s',   s:'https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40.mp3'},
+  {id:'rivad',  n:'Rivadavia',   sub:'AM 630',   bg:'#fff',    fg:'#333',    tx:'Rivad.',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_RIVADAVIA.mp3'},
+  {id:'la100',  n:'La 100',      sub:'FM 99.9',  bg:'#c00',    fg:'#fff',    tx:'100',   s:'https://playerservices.streamtheworld.com/api/livestream-redirect/LA100.mp3'},
+  {id:'america',n:'Rdo. América',sub:'AM 1190',  bg:'#fff',    fg:'#111',    tx:'R.AM.', s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOAMERICA.mp3'},
 ];
 var REC_R=['r10','city','lared','convos','aspen','cadena3','rivad','rockpop'];
 
-function mkRCard(r){
-  var d=document.createElement('div');
-  d.className='rc';d.dataset.id=r.id;d.dataset.name=r.n;
-  var fs=r.tx.length>5?'8px':'9px';
-  d.innerHTML='<div class="rc-img" id="ri-'+r.id+'" style="background:'+r.bg
-    +';color:'+r.fg+';font-size:'+fs+'">'+r.tx+'</div>'
-    +'<div class="rc-nm">'+r.n+'</div>';
-  d.onclick=function(){toggleRadio(r);};
-  return d;
+function mkR(r){
+  var el=document.createElement('div');
+  el.className='rcard';el.dataset.id=r.id;el.dataset.name=r.n;
+  var fs=r.tx.replace(/\n/g,'').length>4?'8px':'10px';
+  el.innerHTML='<div class="rcard-img" id="ri-'+r.id+'" style="background:'+r.bg+';color:'+r.fg+';font-size:'+fs+'">'
+    +r.tx.replace(/\n/g,'<br>')+'</div>'
+    +'<div class="rcard-nm">'+r.n+'</div>';
+  el.onclick=function(){toggleR(r);};
+  return el;
 }
-
 function buildRadios(){
-  var recEl=document.getElementById('row-rrec');
-  var allEl=document.getElementById('row-rall');
+  var rr=document.getElementById('r-rrec');
+  var ra=document.getElementById('r-rall');
   RADIOS.forEach(function(r){
-    allEl.appendChild(mkRCard(r));
-    if(REC_R.indexOf(r.id)>=0) recEl.appendChild(mkRCard(r));
+    ra.appendChild(mkR(r));
+    if(REC_R.indexOf(r.id)>=0) rr.appendChild(mkR(r));
   });
 }
-
 function filterR(q){
   q=q.toLowerCase();
-  document.querySelectorAll('#tab2 .rc').forEach(function(c){
+  document.querySelectorAll('#tab-radios .rcard').forEach(function(c){
     c.classList.toggle('hid',q&&c.dataset.name.toLowerCase().indexOf(q)<0);
   });
 }
 
-/* ══ GLOBAL SEARCH ══ */
-function globalS(q){
-  var res=document.getElementById('gres');
-  res.innerHTML='';
-  if(!q)return;
-  q=q.toLowerCase();
-  var all=[];
-  Object.keys(DIARIOS).forEach(function(k){
-    DIARIOS[k].forEach(function(d){
+/* ════ GLOBAL SEARCH ════ */
+function gSearch(q){
+  var res=document.getElementById('gres');res.innerHTML='';
+  if(!q)return;q=q.toLowerCase();
+  var hits=[];
+  Object.keys(DD).forEach(function(k){
+    DD[k].forEach(function(d){
       if(d.n.toLowerCase().indexOf(q)>=0)
-        all.push({type:'Diario',name:d.n,url:d.u,sub:d.u});
+        hits.push({type:'Diario',name:d.n,sub:d.u,url:d.u});
     });
   });
   RADIOS.forEach(function(r){
     if(r.n.toLowerCase().indexOf(q)>=0)
-      all.push({type:'Radio',name:r.n,sub:r.sub,rid:r.id});
+      hits.push({type:'Radio',name:r.n,sub:r.sub,rid:r.id});
   });
-  if(!all.length){
-    res.innerHTML='<div class="n-loading">Sin resultados para "'+q+'"</div>';return;
-  }
-  all.forEach(function(item){
-    var c=document.createElement('div');
-    c.className='ncard';
-    c.innerHTML='<div class="n-cat">'+item.type+'</div>'
-      +'<div class="n-title">'+item.name+'</div>'
-      +'<div class="n-src">'+item.sub+'</div>';
-    if(item.type==='Diario') c.onclick=function(){openWV(item.url,item.name);};
+  if(!hits.length){res.innerHTML='<div class="n-loading">Sin resultados para "'+q+'"</div>';return;}
+  hits.forEach(function(h){
+    var c=document.createElement('div');c.className='ncard';
+    c.innerHTML='<div class="n-cat">'+h.type+'</div>'
+      +'<div class="n-ttl">'+h.name+'</div>'
+      +'<div class="n-meta"><span class="n-src">'+h.sub+'</span></div>';
+    if(h.type==='Diario') c.onclick=function(){openBr(h.url);};
     else{
-      var rid=item.rid;
-      c.onclick=function(){
-        goTab(2);
-        var r=RADIOS.filter(function(x){return x.id===rid;})[0];
-        if(r) toggleRadio(r);
-      };
+      var rid=h.rid;
+      c.onclick=function(){goTab('radios',2);var r=RADIOS.find(function(x){return x.id===rid;});if(r)toggleR(r);};
     }
     res.appendChild(c);
   });
 }
 
-/* ══ RADIO PLAYER ══ */
-var aud=document.getElementById('aud');
+/* ════ RADIO PLAYER ════ */
+var aud=null;
 var curR=null,isP=false;
 
-function toggleRadio(r){
+function getAud(){
+  if(!aud){
+    aud=document.getElementById('aud');
+    if(!aud){
+      aud=document.createElement('audio');
+      aud.id='aud';aud.preload='none';
+      document.body.appendChild(aud);
+    }
+    aud.onended=function(){stopR();};
+    aud.onerror=function(){
+      document.getElementById('fp-sb').textContent='Error de stream - intentá otra radio';
+      isP=false;
+      document.getElementById('fp-btn').textContent='▶';
+      document.getElementById('fp-bars').classList.add('psd');
+    };
+  }
+  return aud;
+}
+
+function toggleR(r){
   if(curR&&curR.id===r.id&&isP){pauseR();return;}
   playR(r);
 }
+
 function playR(r){
-  stopRadio(false);
+  stopR(false);
   curR=r;isP=true;
-  aud.src=r.s;aud.load();aud.play();
-  document.querySelectorAll('.rc-img').forEach(function(el){
-    el.classList.toggle('pl',el.id==='ri-'+r.id);
+  var a=getAud();
+  /* stop any previous */
+  a.pause();
+  a.src='';
+  /* small delay so WebView releases previous stream */
+  setTimeout(function(){
+    a.src=r.s;
+    var p=a.play();
+    if(p&&p.catch) p.catch(function(e){
+      console.log('audio play error:',e);
+      /* try reload on error */
+      setTimeout(function(){a.load();a.play().catch(function(){});},500);
+    });
+  },80);
+
+  /* update UI */
+  document.querySelectorAll('.rcard-img').forEach(function(el){
+    el.classList.toggle('playing',el.id==='ri-'+r.id);
   });
-  var logo=document.getElementById('fpl-logo');
-  logo.style.background=r.bg;logo.style.color=r.fg;
-  logo.style.fontSize=r.tx.length>5?'7px':'9px';
-  logo.textContent=r.tx;
-  document.getElementById('fpl-name').textContent=r.n;
-  document.getElementById('fpl-sub').textContent=r.sub+' - En vivo';
-  document.getElementById('fpbars').classList.remove('psd');
-  document.getElementById('fpl-btn').innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" stroke="none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
-  document.getElementById('fpl').classList.add('on');
+  var fs=r.tx.replace(/\n/g,'').length>4?'7px':'9px';
+  var logo=document.getElementById('fp-logo');
+  logo.style.cssText='width:40px;height:40px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;text-align:center;flex-shrink:0;background:'+r.bg+';color:'+r.fg+';font-size:'+fs;
+  logo.innerHTML=r.tx.replace(/\n/g,'<br>');
+  document.getElementById('fp-nm').textContent=r.n;
+  document.getElementById('fp-sb').textContent=r.sub+' · En vivo';
+  document.getElementById('fp-btn').innerHTML='&#9208;';
+  document.getElementById('fp-bars').classList.remove('psd');
+  document.getElementById('fplay').classList.add('on');
 }
+
 function pauseR(){
-  aud.pause();isP=false;
-  document.getElementById('fpbars').classList.add('psd');
-  document.getElementById('fpl-btn').innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" stroke="none"><polygon points="5,3 19,12 5,21"/></svg>';
+  getAud().pause();isP=false;
+  document.getElementById('fp-btn').innerHTML='&#9654;';
+  document.getElementById('fp-bars').classList.add('psd');
 }
-function stopRadio(hide){
-  aud.pause();aud.src='';isP=false;curR=null;
-  document.querySelectorAll('.rc-img').forEach(function(el){el.classList.remove('pl');});
-  if(hide!==false) document.getElementById('fpl').classList.remove('on');
+
+function stopR(hide){
+  var a=getAud();
+  a.pause();a.src='';
+  isP=false;curR=null;
+  document.querySelectorAll('.rcard-img').forEach(function(el){el.classList.remove('playing');});
+  if(hide!==false) document.getElementById('fplay').classList.remove('on');
 }
+
 function togglePlay(){
   if(isP){pauseR();}
   else if(curR){
-    aud.play();isP=true;
-    document.getElementById('fpbars').classList.remove('psd');
-    document.getElementById('fpl-btn').innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" stroke="none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+    var a=getAud();
+    var p=a.play();
+    if(p&&p.catch) p.catch(function(){a.load();a.play().catch(function(){});});
+    isP=true;
+    document.getElementById('fp-btn').innerHTML='&#9208;';
+    document.getElementById('fp-bars').classList.remove('psd');
   }
 }
-aud.onended=function(){stopRadio();};
 
-/* ══ NOTICIAS ══ */
-var newsLoaded=false;
-function loadNews(force){
-  if(newsLoaded&&!force)return;
-  var msg=document.getElementById('news-msg');
-  var list=document.getElementById('news-list');
-  msg.textContent='Cargando noticias...';
-  msg.style.display='block';
-  list.innerHTML='';
-  newsLoaded=false;
-
-  var body=JSON.stringify({
-    model:'claude-sonnet-4-6',
-    max_tokens:1200,
-    messages:[{role:'user',content:'Genera un JSON con las 14 noticias mas importantes del dia para Argentina e internacionales. Responde SOLO con un array JSON valido, sin markdown, sin backticks, sin texto previo ni posterior. Formato exacto de cada objeto: {"cat":"POLITICA","title":"Titulo breve de la noticia","src":"Nombre del medio","sum":"Resumen de 1 oracion","url":"https://enlace-al-articulo.com"}. Incluye noticias de: politica argentina, economia, dolar/inflacion, internacional, ciencia, tecnologia, deportes. Fecha actual: '+new Date().toLocaleDateString('es-AR')+'.'}]
-  });
-
-  var xhr=new XMLHttpRequest();
-  xhr.open('POST','https://api.anthropic.com/v1/messages',true);
-  xhr.setRequestHeader('Content-Type','application/json');
-  xhr.timeout=25000;
-  xhr.onreadystatechange=function(){
-    if(xhr.readyState!==4)return;
-    if(xhr.status===200){
-      try{
-        var data=JSON.parse(xhr.responseText);
-        var raw=data.content.map(function(x){return x.text||'';}).join('').trim();
-        raw=raw.replace(/```json|```/g,'').trim();
-        var arr=JSON.parse(raw);
-        msg.style.display='none';
-        arr.forEach(function(n){
-          var c=document.createElement('div');
-          c.className='ncard';
-          c.innerHTML='<div class="n-cat">'+n.cat+'</div>'
-            +'<div class="n-title">'+n.title+'</div>'
-            +(n.sum?'<div class="n-src" style="color:#bbb;font-size:11px">'+n.sum+'</div>':'')
-            +'<div class="n-src">'+n.src+' <span class="n-arrow">- Leer nota</span></div>';
-          if(n.url&&n.url.indexOf('http')===0){
-            c.onclick=function(){openWV(n.url,n.src);};
-          }
-          list.appendChild(c);
-        });
-        newsLoaded=true;
-      }catch(e){
-        msg.textContent='Error al procesar. Toca "Actualizar" para reintentar.';
-      }
-    } else {
-      msg.textContent='Sin conexion. Toca "Actualizar" para reintentar.';
-    }
-  };
-  try{xhr.send(body);}catch(e){msg.textContent='Error de red.';}
+/* ════ NOTEPAD ════ */
+var noteKey='aldia_notes';
+function loadNote(){
+  var saved=localStorage.getItem(noteKey)||'';
+  document.getElementById('notepad-area').value=saved;
 }
-
-/* ══ BLOC DE NOTAS ══ */
-function loadNota(){
-  var t=localStorage.getItem('aldiaNotas')||'';
-  document.getElementById('nota').value=t;
+function saveNote(){
+  localStorage.setItem(noteKey,document.getElementById('notepad-area').value);
+  var msg=document.getElementById('note-msg');
+  msg.style.display='inline';
+  setTimeout(function(){msg.style.display='none';},2000);
 }
-function saveNota(){
-  var t=document.getElementById('nota').value;
-  localStorage.setItem('aldiaNotas',t);
-  var ok=document.getElementById('note-ok');
-  ok.textContent='Guardado correctamente';
-  setTimeout(function(){ok.textContent='';},2000);
+function clearNote(){
+  if(confirm('¿Borrar todas las notas?')){
+    document.getElementById('notepad-area').value='';
+    localStorage.removeItem(noteKey);
+  }
 }
-function clearNota(){
-  if(!confirm('Borrar todas las notas?'))return;
-  document.getElementById('nota').value='';
-  localStorage.removeItem('aldiaNotas');
+function copyNote(){
+  var txt=document.getElementById('notepad-area').value;
+  if(navigator.clipboard){navigator.clipboard.writeText(txt);}
+  else{
+    document.getElementById('notepad-area').select();
+    document.execCommand('copy');
+  }
+  var msg=document.getElementById('note-msg');
+  msg.textContent='&#10003; Copiado';msg.style.display='inline';
+  setTimeout(function(){msg.style.display='none';msg.textContent='&#10003; Guardado';},2000);
 }
-// Autosave on typing
-var noteTimer=null;
-document.getElementById('nota').addEventListener('input',function(){
-  clearTimeout(noteTimer);
-  noteTimer=setTimeout(function(){
-    localStorage.setItem('aldiaNotas',document.getElementById('nota').value);
-  },1500);
+// Auto-save on change
+document.addEventListener('DOMContentLoaded',function(){
+  var na=document.getElementById('notepad-area');
+  if(na) na.addEventListener('input',function(){localStorage.setItem(noteKey,na.value);});
 });
 
-/* ══ INIT ══ */
-window.onload=function(){
-  hasFB=tryFB();
-  var saved=localStorage.getItem('aldiaUser');
-  if(saved) setUser(saved);
-  initBanner();
-  buildDiarios();
-  buildRadios();
-  loadFinancial();
-  setInterval(loadFinancial,5*60*1000);
-};
+/* ════ NOTICIAS — RSS + fallback offline ════ */
+var newsLoaded=false;
+var newsAll=[];
+
+/* Noticias de respaldo (siempre visibles, sin red) */
+var NEWS_FALLBACK=[
+  {cat:'ECONOMÍA',src:'Ámbito',title:'Dólar hoy: cotizaciones oficiales y paralelas en Argentina',desc:'Seguí en tiempo real el precio del dólar oficial, blue, MEP y CCL en todo el país.',url:'https://www.ambito.com/economia/dolar'},
+  {cat:'POLÍTICA',src:'Infobae',title:'Últimas noticias de la Casa Rosada y el Congreso Nacional',desc:'Cobertura en vivo de las decisiones del Poder Ejecutivo y el debate legislativo.',url:'https://www.infobae.com/politica'},
+  {cat:'INTERNACIONAL',src:'BBC Mundo',title:'Conflictos y tensiones geopolíticas que marcan la agenda mundial',desc:'Oriente Medio, Europa del Este y América Latina bajo la lupa informativa internacional.',url:'https://www.bbc.com/mundo'},
+  {cat:'ECONOMÍA',src:'Cronista',title:'Inflación y tasas: el impacto en el bolsillo de los argentinos',desc:'Análisis del índice de precios al consumidor y su efecto en salarios y jubilaciones.',url:'https://www.cronista.com'},
+  {cat:'DEPORTES',src:'Olé',title:'Fútbol argentino: resultados, fixture y tabla de posiciones',desc:'Liga Profesional, Copa Argentina y novedades de los principales clubes del país.',url:'https://www.ole.com.ar'},
+  {cat:'TECNOLOGÍA',src:'Infobae Tech',title:'Inteligencia artificial: las novedades que cambian el mundo digital',desc:'Nuevos modelos de IA, regulaciones y el impacto en el mercado laboral global.',url:'https://www.infobae.com/tecno'},
+  {cat:'SOCIEDAD',src:'La Nación',title:'Educación y salud: los temas que más preocupan a los argentinos',desc:'Encuestas y análisis sobre las prioridades sociales en el contexto actual.',url:'https://www.lanacion.com.ar'},
+  {cat:'POLÍTICA',src:'Página/12',title:'Debate sobre ajuste fiscal y su efecto en el gasto social',desc:'Las diferentes posturas políticas frente a las medidas económicas del gobierno.',url:'https://www.pagina12.com.ar'},
+  {cat:'INTERNACIONAL',src:'Reuters',title:'Mercados globales: Wall Street y las bolsas europeas en foco',desc:'Movimientos del Dow Jones, Nasdaq y el precio de las materias primas clave.',url:'https://www.reuters.com'},
+  {cat:'DEPORTES',src:'TyC Sports',title:'Selección Argentina: convocatoria y próximos partidos eliminatorios',desc:'Novedades del cuerpo técnico de la Albiceleste y los jugadores a seguir.',url:'https://www.tycsports.com'},
+  {cat:'ECONOMÍA',src:'La Nación',title:'Reservas del BCRA y política monetaria: el panorama financiero semanal',desc:'Análisis de la situación cambiaria y las perspectivas para el mercado local.',url:'https://www.lanacion.com.ar/economia'},
+  {cat:'CIENCIA',src:'Infobae',title:'Descubrimientos científicos argentinos que impactan al mundo',desc:'Investigaciones del CONICET y universidades nacionales con reconocimiento internacional.',url:'https://www.infobae.com/ciencia'},
+];
+
+var RSS_FEEDS=[
+  {src:'Infobae',    cat:'GENERAL',      url:'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.infobae.com%2Ffeeds%2Frss%2F'},
+  {src:'La Nacion',  cat:'POLÍTICA',     url:'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.lanacion.com.ar%2Farc%2Foutboundfeeds%2Frss%2F'},
+  {src:'Ambito',     cat:'ECONOMÍA',     url:'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.ambito.com%2Frss%2Fpages%2Feconomia.xml'},
+  {src:'BBC Mundo',  cat:'INTERNACIONAL',url:'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Ffeeds.bbci.co.uk%2Fmundo%2Frss.xml'},
+  {src:'Ole',        cat:'DEPORTES',     url:'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.ole.com.ar%2Frss%2Ftodas-las-noticias%2F'},
+];
+
+function loadNews(){
+  if(newsLoaded)return;
+  var st=document.getElementById('news-status');
+  var list=document.getElementById('news-list');
+  newsAll=[];
+  list.innerHTML='';
+
+  /* Mostrar fallback de inmediato */
+  st.style.display='none';
+  renderItems(NEWS_FALLBACK,list,'fallback');
+
+  /* Intentar RSS encima */
+  st.innerHTML='&#8635; Actualizando noticias...';
+  st.style.cssText='display:block;font-size:11px;color:#666;text-align:right;padding:0 4px 6px';
+
+  var done=0,total=RSS_FEEDS.length;
+  RSS_FEEDS.forEach(function(feed){
+    xget(feed.url,function(data){
+      done++;
+      if(data&&data.items&&data.items.length){
+        data.items.slice(0,5).forEach(function(item){
+          newsAll.push({
+            cat:feed.cat,src:feed.src,
+            title:(item.title||'').trim(),
+            desc:stripHTML(item.description||item.content||'').substring(0,120),
+            url:item.link||item.guid||''
+          });
+        });
+      }
+      if(done>=total){
+        if(newsAll.length>0){
+          list.innerHTML='';
+          st.style.display='none';
+          renderItems(newsAll,list,'live');
+        } else {
+          st.style.display='none'; /* keep fallback */
+        }
+        newsLoaded=true;
+      }
+    });
+  });
+
+  /* Si no cargó el RSS en 10s, dar por bueno el fallback */
+  setTimeout(function(){
+    if(!newsLoaded){
+      newsLoaded=true;
+      st.style.display='none';
+    }
+  },10000);
+}
+
+function renderItems(arr,list,mode){
+  arr.forEach(function(n){
+    if(!n.title)return;
+    var badge=mode==='live'
+      ? '<span style="background:#e8342a;color:#fff;font-size:8px;font-weight:700;padding:1px 5px;border-radius:10px;margin-left:6px">EN VIVO</span>'
+      : '';
+    var c=document.createElement('div');
+    c.className='ncard';
+    c.innerHTML='<div class="n-cat">'+n.cat+' &mdash; '+n.src+badge+'</div>'
+      +'<div class="n-ttl">'+escH(n.title)+'</div>'
+      +(n.desc?'<div style="font-size:11px;color:#777;margin:4px 0 5px;line-height:1.4">'+escH(n.desc)+(mode==='live'?'...':'')+'</div>':'')
+      +'<div class="n-meta"><span class="n-link">Ver nota &#8594;</span></div>';
+    if(n.url&&n.url.indexOf('http')===0)
+      c.onclick=(function(u){return function(){openBr(u);};})(n.url);
+    list.appendChild(c);
+  });
+}
+
+function stripHTML(h){return h.replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();}
+function escH(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
+
+<!-- FLOATING PLAYER (outside shell so it overlays everything) -->
+<div id="fplay">
+  <div id="fp-logo">&#128251;</div>
+  <div id="fp-info">
+    <div class="fp-bars" id="fp-bars">
+      <div class="fp-b"></div><div class="fp-b"></div>
+      <div class="fp-b"></div><div class="fp-b"></div><div class="fp-b"></div>
+    </div>
+    <div id="fp-nm">Radio</div>
+    <div id="fp-sb">En vivo</div>
+  </div>
+  <button id="fp-btn" onclick="togglePlay()">&#9208;</button>
+</div>
+
 </body>
 </html>
