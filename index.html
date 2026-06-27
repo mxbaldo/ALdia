@@ -214,7 +214,7 @@ body{height:100%;background:#111;color:#fff;
   color:#555;font-size:9px;font-weight:700;
   letter-spacing:.2px;padding:0;
 }
-.nb .ni{font-size:16px;line-height:1.1}
+.nb .ni{font-size:13px;line-height:1.1}
 .nb.on{color:#e8342a}
 .nb.on .ni{transform:scale(1.1)}
 #navind{
@@ -230,9 +230,9 @@ body{height:100%;background:#111;color:#fff;
   background:#1565c0;border-radius:12px;
   display:flex;align-items:center;gap:10px;padding:9px 11px;
   z-index:250;box-shadow:0 4px 20px rgba(21,101,192,.5);
-  transform:translateY(200%);transition:transform .28s;
+  display:none;
 }
-#fplay.on{transform:translateY(0)}
+#fplay.on{display:flex;}
 #fp-logo{
   width:40px;height:40px;border-radius:7px;
   display:flex;align-items:center;justify-content:center;
@@ -539,7 +539,7 @@ body{height:100%;background:#111;color:#fff;
   </div>
 </div>
 
-<audio id="aud" preload="none"></audio>
+<audio id="aud" preload="none" playsinline webkit-playsinline x-webkit-airplay="allow"></audio>
 
 <script>
 /* ════════════════════════════════════════
@@ -783,18 +783,18 @@ function buildDiarios(){
 
 /* ════ RADIOS ════ */
 var RADIOS=[
-  {id:'r10',    n:'Radio 10',    sub:'AM 710',   bg:'#fff',    fg:'#c00',    tx:'R10))',  s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO10AM.mp3'},
-  {id:'mitre',  n:'Radio Mitre', sub:'AM 790',   bg:'#1d3557', fg:'#fff',    tx:'MITRE', s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOMITRE.mp3'},
-  {id:'city',   n:'Radio City',  sub:'FM 107.1', bg:'#111',    fg:'#ff0',    tx:'CITY',  s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOCITY.mp3'},
-  {id:'lared',  n:'La Red',      sub:'AM 910',   bg:'#fff',    fg:'#005ab5', tx:'la\nred',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/LARED.mp3'},
-  {id:'convos', n:'Con Vos',     sub:'FM 89.9',  bg:'#1a5276', fg:'#fff',    tx:'CON\nVOS',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/CONVOSFM.mp3'},
-  {id:'cadena3',n:'Cadena 3',    sub:'Argentina',bg:'#1565c0', fg:'#fff',    tx:'C3))',  s:'https://playerservices.streamtheworld.com/api/livestream-redirect/CADENA3AAC.aac'},
-  {id:'aspen',  n:'Aspen 102.3', sub:'FM 102.3', bg:'#111',    fg:'#fff',    tx:'ASPEN', s:'https://playerservices.streamtheworld.com/api/livestream-redirect/FMASPEN.mp3'},
-  {id:'rockpop',n:'Rock & Pop',  sub:'FM 95.9',  bg:'#222',    fg:'#f4c430', tx:'R&P',   s:'https://playerservices.streamtheworld.com/api/livestream-redirect/ROCKPOP.mp3'},
-  {id:'los40',  n:'Los 40',      sub:'FM 105.5', bg:'#ff8c00', fg:'#fff',    tx:'40s',   s:'https://playerservices.streamtheworld.com/api/livestream-redirect/LOS40.mp3'},
-  {id:'rivad',  n:'Rivadavia',   sub:'AM 630',   bg:'#fff',    fg:'#333',    tx:'Rivad.',s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_RIVADAVIA.mp3'},
-  {id:'la100',  n:'La 100',      sub:'FM 99.9',  bg:'#c00',    fg:'#fff',    tx:'100',   s:'https://playerservices.streamtheworld.com/api/livestream-redirect/LA100.mp3'},
-  {id:'america',n:'Rdo. América',sub:'AM 1190',  bg:'#fff',    fg:'#111',    tx:'R.AM.', s:'https://playerservices.streamtheworld.com/api/livestream-redirect/RADIOAMERICA.mp3'},
+  {id:'r10',    n:'Radio 10',    sub:'AM 710',   bg:'#fff',    fg:'#c00',    tx:'R10))',  s:'https://15723.live.streamtheworld.com/RADIO10AM.mp3'},
+  {id:'mitre',  n:'Radio Mitre', sub:'AM 790',   bg:'#1d3557', fg:'#fff',    tx:'MITRE', s:'https://15723.live.streamtheworld.com/RADIOMITRE.mp3'},
+  {id:'city',   n:'Radio City',  sub:'FM 107.1', bg:'#111',    fg:'#ff0',    tx:'CITY',  s:'https://15723.live.streamtheworld.com/RADIOCITY.mp3'},
+  {id:'lared',  n:'La Red',      sub:'AM 910',   bg:'#fff',    fg:'#005ab5', tx:'la\nred',s:'https://15723.live.streamtheworld.com/LARED.mp3'},
+  {id:'convos', n:'Con Vos',     sub:'FM 89.9',  bg:'#1a5276', fg:'#fff',    tx:'CON\nVOS',s:'https://15723.live.streamtheworld.com/CONVOSFM.mp3'},
+  {id:'cadena3',n:'Cadena 3',    sub:'Argentina',bg:'#1565c0', fg:'#fff',    tx:'C3))',  s:'https://15723.live.streamtheworld.com/CADENA3AAC.aac'},
+  {id:'aspen',  n:'Aspen 102.3', sub:'FM 102.3', bg:'#111',    fg:'#fff',    tx:'ASPEN', s:'https://15723.live.streamtheworld.com/FMASPEN.mp3'},
+  {id:'rockpop',n:'Rock & Pop',  sub:'FM 95.9',  bg:'#222',    fg:'#f4c430', tx:'R&P',   s:'https://15723.live.streamtheworld.com/ROCKPOP.mp3'},
+  {id:'los40',  n:'Los 40',      sub:'FM 105.5', bg:'#ff8c00', fg:'#fff',    tx:'40s',   s:'https://15723.live.streamtheworld.com/LOS40.mp3'},
+  {id:'rivad',  n:'Rivadavia',   sub:'AM 630',   bg:'#fff',    fg:'#333',    tx:'Rivad.',s:'https://15723.live.streamtheworld.com/RADIO_RIVADAVIA.mp3'},
+  {id:'la100',  n:'La 100',      sub:'FM 99.9',  bg:'#c00',    fg:'#fff',    tx:'100',   s:'https://15723.live.streamtheworld.com/LA100.mp3'},
+  {id:'america',n:'Rdo. América',sub:'AM 1190',  bg:'#fff',    fg:'#111',    tx:'R.AM.', s:'https://15723.live.streamtheworld.com/RADIOAMERICA.mp3'},
 ];
 var REC_R=['r10','city','lared','convos','aspen','cadena3','rivad','rockpop'];
 
@@ -885,19 +885,29 @@ function playR(r){
   stopR(false);
   curR=r;isP=true;
   var a=getAud();
-  /* stop any previous */
   a.pause();
   a.src='';
-  /* small delay so WebView releases previous stream */
+  a.load();
+  /* Android WebView: set src then load then play */
   setTimeout(function(){
     a.src=r.s;
-    var p=a.play();
-    if(p&&p.catch) p.catch(function(e){
-      console.log('audio play error:',e);
-      /* try reload on error */
-      setTimeout(function(){a.load();a.play().catch(function(){});},500);
-    });
-  },80);
+    a.load();
+    var tryPlay=function(){
+      var p=a.play();
+      if(p&&typeof p.then==='function'){
+        p.then(function(){isP=true;}).catch(function(e){
+          /* WebView may need user-gesture flag - retry once */
+          setTimeout(function(){
+            a.load();
+            a.play().catch(function(){
+              document.getElementById('fp-sb').textContent='Toca nuevamente para reproducir';
+            });
+          },300);
+        });
+      }
+    };
+    tryPlay();
+  },150);
 
   /* update UI */
   document.querySelectorAll('.rcard-img').forEach(function(el){
@@ -911,7 +921,7 @@ function playR(r){
   document.getElementById('fp-sb').textContent=r.sub+' · En vivo';
   document.getElementById('fp-btn').innerHTML='&#9208;';
   document.getElementById('fp-bars').classList.remove('psd');
-  document.getElementById('fplay').classList.add('on');
+  var fp=document.getElementById('fplay');fp.style.display='flex';
 }
 
 function pauseR(){
@@ -925,7 +935,7 @@ function stopR(hide){
   a.pause();a.src='';
   isP=false;curR=null;
   document.querySelectorAll('.rcard-img').forEach(function(el){el.classList.remove('playing');});
-  if(hide!==false) document.getElementById('fplay').classList.remove('on');
+  if(hide!==false){var fp=document.getElementById('fplay');fp.style.display='none';}
 }
 
 function togglePlay(){
